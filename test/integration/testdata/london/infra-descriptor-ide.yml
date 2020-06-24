@@ -1,0 +1,145 @@
+# Author: Sebastian Robitzsch <sebastian.robitzsch@interdigital.com>
+
+compute_nodes:
+    os-data-centre-1:
+        availability_zone: nova
+        name: os-data-centre-1
+        vcpus: 38
+        ram: 29000
+        disk: 800
+        networks:
+          - 1449337d-3c21-471d-aa9b-db857cf3653e
+          - 058319d1-ec1a-46c1-bc97-3631f4fa1167
+          - 2765f604-9f5a-4bf8-b859-cb571f55762f
+          - 83d68f68-b36f-4bfc-9eb9-3fae3f9004e6
+          - 948cc7ef-1728-4fb0-9b1f-d659b02527e2
+          - e293a6c5-e9b9-4d9c-8ec2-c3f8083db56c
+          - f643dbc2-42e3-47ec-9d1a-47253dd1212a
+          - 716c64ee-0dae-4c54-931b-492e3bc81195
+        tier: data_centre
+    os-data-centre-2:
+        availability_zone: nova
+        name: os-data-centre-2
+        vcpus: 38
+        ram: 29000
+        disk: 800
+        networks:
+          - 1449337d-3c21-471d-aa9b-db857cf3653e
+          - 2765f604-9f5a-4bf8-b859-cb571f55762f
+          - e293a6c5-e9b9-4d9c-8ec2-c3f8083db56c
+          - f643dbc2-42e3-47ec-9d1a-47253dd1212a
+          - 645e4a7a-6d44-4588-acb6-96adaa993916
+        tier: data_centre
+    os-edge-1:
+        availability_zone: nova
+        name: os-edge-1
+        vcpus: 14
+        ram: 60000
+        disk: 200
+        networks:
+          - 1449337d-3c21-471d-aa9b-db857cf3653e
+          - 2765f604-9f5a-4bf8-b859-cb571f55762f
+          - 54d1ae76-aa00-475b-8c4e-adad70285106
+          - e293a6c5-e9b9-4d9c-8ec2-c3f8083db56c
+          - f643dbc2-42e3-47ec-9d1a-47253dd1212a
+        tier: edge
+    os-edge-2:
+        availability_zone: nova
+        name: os-edge-2
+        vcpus: 14
+        ram: 60000
+        disk: 200
+        networks:
+          - 1449337d-3c21-471d-aa9b-db857cf3653e
+          - 2765f604-9f5a-4bf8-b859-cb571f55762f
+          - 454aa87d-9d44-433b-a541-a5fc87ecaf1b
+          - e293a6c5-e9b9-4d9c-8ec2-c3f8083db56c
+          - f643dbc2-42e3-47ec-9d1a-47253dd1212a
+        tier: edge
+    os-edge-3:
+        availability_zone: nova
+        name: os-edge-3
+        vcpus: 14
+        ram: 60000
+        disk: 1000
+        networks:
+          - 1449337d-3c21-471d-aa9b-db857cf3653e
+          - 2765f604-9f5a-4bf8-b859-cb571f55762f
+          - c1d925be-76ea-4dcb-8a9e-ed5a24d992f8
+          - e293a6c5-e9b9-4d9c-8ec2-c3f8083db56c
+          - f643dbc2-42e3-47ec-9d1a-47253dd1212a
+        tier: edge
+            
+networks:
+    flame-mgmt:
+        identifier: 1449337d-3c21-471d-aa9b-db857cf3653e
+        category: mgmt
+    flame-msp-dc1:
+        identifier: 058319d1-ec1a-46c1-bc97-3631f4fa1167
+        category: msp
+    flame-data1:
+        identifier: 2765f604-9f5a-4bf8-b859-cb571f55762f
+        category: data
+    flame-cluster-e1:
+        identifier: 54d1ae76-aa00-475b-8c4e-adad70285106
+        category: cluster
+    flame-cluster-e2:
+        identifier: 454aa87d-9d44-433b-a541-a5fc87ecaf1b
+        category:  cluster
+    flame-cluster-e3:
+        identifier: c1d925be-76ea-4dcb-8a9e-ed5a24d992f8
+        category: cluster
+    flame-cluster-dc2:
+        identifier: 645e4a7a-6d44-4588-acb6-96adaa993916
+        category: cluster
+    flame-ps-dc1:
+        identifier: 83d68f68-b36f-4bfc-9eb9-3fae3f9004e6
+        category: ps
+    flame-sia:
+        identifier: 948cc7ef-1728-4fb0-9b1f-d659b02527e2
+        category: sia
+    flame-wan:
+        identifier: e293a6c5-e9b9-4d9c-8ec2-c3f8083db56c
+        category: wan
+    flame-data2:
+        identifier: eee957e4-f150-4a18-8e9b-dfd343d1555f
+        category: data
+    flame-sdnctrl:
+        identifier: f643dbc2-42e3-47ec-9d1a-47253dd1212a
+        category: sdnctrl
+    flame-clmc-dc1:
+        identifier: 716c64ee-0dae-4c54-931b-492e3bc81195
+        category: clmc-sfemc
+
+subnets:
+    flame-sia:
+        identifier: 6be747bc-7914-46d2-b81b-892bb504cb9f
+        category: sia
+
+security_groups:
+    flame-mgmt:
+        identifier: 8361221f-b55e-470f-85ae-3f1100430b50
+        category: mgmt
+    flame-msp:
+        identifier: d7e362f0-b290-4797-8862-66380e407905
+        category: msp
+    flame-sdnctrl:
+        identifier: b1677778-538a-4e2b-b88a-453779954c7e
+        category: sdnctrl
+    flame-sia:
+        identifier: f77fcf56-9ddc-4c44-bede-e52800e22c78
+        category: sia
+    flame-wan:
+        identifier: b3088db5-df63-4443-b595-880d17491fd8
+        category: wan
+
+infrastructure_services:
+    ip_gateway: 10.6.224.1
+    dns: 10.6.64.254
+    sdn_controller: 172.50.231.137
+
+metadata:
+    tenant: 73e73c407d0940fc9e7ef08a1c3f568b
+    cidr: 192.168.0.0/16
+    mtu: 1492
+    sia-ip-frontend: 172.70.231.199

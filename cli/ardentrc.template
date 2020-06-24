@@ -1,0 +1,3 @@
+export ARDENT=127.0.0.1
+export ARDENT_PORT=8080
+export ARDENT_STACK_NAME=flame-platform

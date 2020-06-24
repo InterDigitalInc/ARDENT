@@ -1,0 +1,519 @@
+[
+	{
+		"testName": "Delete Infra Descriptor",
+		"endPoint": "/infra/descriptor",
+		"method": "DELETE",
+		"removeSanityResult": true,
+		"output": {
+			"httpCode": 200,
+			"statusId": 0,
+			"statusStr": "Request Successful",
+			"compareResponse": false
+		}
+	}, {
+		"testName": "Delete Tenant OpenRC",
+		"endPoint": "/infra/rc/tenant",
+		"method": "DELETE",
+		"removeSanityResult": true,
+		"output": {
+			"httpCode": 200,
+			"statusId": 0,
+			"statusStr": "Request Successful",
+			"compareResponse": false
+		}
+	},
+    {
+        "testName": "Add Infra Descriptor to Initiate Sanity Check with Payload",
+        "endPoint": "/infra/descriptor",
+        "method": "PUT",
+        "removeSanityResult": true,
+        "input": "id-sanity.yml",
+        "output": {
+            "httpCode": 200,
+            "statusId": 0,
+            "statusStr": "Request Successful",
+            "compareResponse": false
+        }
+    },
+	{
+        "testName": "Initiate Sanity Check with Payload",
+        "endPoint": "/sanity-check",
+        "method": "POST",
+        "removeSanityResult": true,
+		"input": "id-sanity.yml",
+        "output": {
+            "httpCode": 403,
+            "statusId": 1,
+            "statusStr": "Payload not expected in the Request",
+            "compareResponse": false
+        }
+    },
+    {
+        "testName": "Add Tenant OpenRC before deleting Infra Descriptor",
+        "endPoint": "/infra/rc/tenant",
+        "method": "PUT",
+        "removeSanityResult": true,
+        "input": "tenant-openrc-final",
+        "output": {
+            "httpCode": 200,
+            "statusId": 0,
+            "statusStr": "Request Successful",
+            "compareResponse": false
+        }
+    },
+	{
+        "testName": "Delete Infra Descriptor after Initiating Sanity Check with Payload",
+        "endPoint": "/infra/descriptor",
+        "method": "DELETE",
+        "removeSanityResult": true,
+        "output": {
+            "httpCode": 200,
+            "statusId": 0,
+            "statusStr": "Request Successful",
+            "compareResponse": false
+        }
+    },
+	{
+		"testName": "Initiate Sanity Check without Infra Descriptor, Tenant OpenRC",
+		"endPoint": "/sanity-check",
+		"method": "POST",
+		"removeSanityResult": true,
+		"output": {
+			"httpCode": 403,
+			"statusId": 401,
+			"statusStr": "Incomplete infra descriptor found: compute-nodes are not present",
+			"compareResponse": false
+		}
+	},
+    {
+        "testName": "Get Sanity Check Status with invalid Sanity Result file",
+        "endPoint": "/sanity-check/status",
+        "method": "GET",
+        "removeSanityResult": true,
+        "output": {
+            "httpCode": 500,
+            "statusId": 411,
+            "statusStr": "Error in unmarshaling sanity result",
+			"writeSanityResult": true,
+            "compareResponse": false
+        }
+    },
+    {
+        "testName": "Get Sanity Check Results with invalid Sanity Result file",
+        "endPoint": "/sanity-check/results",
+        "method": "GET",
+        "removeSanityResult": false,
+        "output": {
+            "httpCode": 500,
+            "statusId": 411,
+            "statusStr": "Error in unmarshaling sanity result",
+            "compareResponse": false
+        }
+    },
+    {
+        "testName": "Get Sanity Check Status with Payload",
+        "endPoint": "/sanity-check/status",
+        "method": "GET",
+		"input": "id-sanity.yml",
+        "removeSanityResult": true,
+        "output": {
+            "httpCode": 403,
+            "statusId": 1,
+            "statusStr": "Payload not expected in the Request",
+            "compareResponse": false
+        }
+    },
+	{
+		"testName": "Get Sanity Check Status without initiating Sanity Check, Infra Descriptor, TenantRC",
+		"endPoint": "/sanity-check/status",
+		"method": "GET",
+		"removeSanityResult": true,
+		"output": {
+			"httpCode": 403,
+			"statusId": 401,
+			"statusStr": "Sanity-Check not initiated",
+			"compareResponse": false
+		}
+	},
+    {
+        "testName": "Get Sanity Check Results with Payload",
+        "endPoint": "/sanity-check/results",
+        "method": "GET",
+		"input": "id-sanity.yml",
+        "removeSanityResult": true,
+        "output": {
+            "httpCode": 403,
+            "statusId": 1,
+            "statusStr": "Payload not expected in the Request",
+            "compareResponse": false
+        }
+    },
+	{
+		"testName": "Get Sanity Check Results without initiating Sanity Check, Infra Descriptor, TenantRC",
+		"endPoint": "/sanity-check/results",
+		"method": "GET",
+		"removeSanityResult": true,
+		"output": {
+			"httpCode": 403,
+			"statusId": 401,
+			"statusStr": "Sanity-Check not initiated",
+			"compareResponse": false
+		}
+	},
+	{
+		"testName": "Add Infra Descriptor",
+		"endPoint": "/infra/descriptor",
+		"method": "PUT",
+		"removeSanityResult": true,
+		"input": "id-sanity.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 0,
+			"statusStr": "Request Successful",
+			"compareResponse": false
+		}
+	},
+	{
+		"testName": "Delete Tenant OpenRC after adding Infra Descriptor",
+		"endPoint": "/infra/rc/tenant",
+		"method": "DELETE",
+		"removeSanityResult": true,
+		"output": {
+			"httpCode": 200,
+			"statusId": 0,
+			"statusStr": "Request Successful",
+			"compareResponse": false
+		}
+	},
+	{
+		"testName": "Initiate Sanity Check without Tenant OpenRC",
+		"endPoint": "/sanity-check",
+		"method": "POST",
+		"removeSanityResult": true,
+		"output": {
+			"httpCode": 202,
+			"compareResponse": false
+		}
+	},
+    {
+        "testName": "Get Sanity Check Status after initiating Sanity Check without TenantRC",
+        "endPoint": "/sanity-check/status",
+        "method": "GET",
+        "removeSanityResult": false,
+        "output": {
+            "httpCode": 200,
+            "statusId": 452,
+            "statusStr": "Sanity-Check failed",
+            "compareResponse": false
+        }
+    },
+    {
+        "testName": "Get Sanity Check Results after initiating Sanity Check without TenantRC",
+        "endPoint": "/sanity-check/results",
+        "method": "GET",
+        "removeSanityResult": false,
+        "output": {
+            "httpCode": 200,
+            "statusId": 401,
+            "compareResponse": false
+        }
+    },
+	{
+		"testName": "Get Sanity Check Status without initiating Sanity Check, TenantRC",
+		"endPoint": "/sanity-check/status",
+		"method": "GET",
+		"removeSanityResult": true,
+		"output": {
+			"httpCode": 403,
+			"statusId": 401,
+			"statusStr": "Sanity-Check not initiated",
+			"compareResponse": false
+		}
+	},
+	{
+		"testName": "Get Sanity Check Results without initiating Sanity Check, TenantRC",
+		"endPoint": "/sanity-check/results",
+		"method": "GET",
+		"removeSanityResult": true,
+		"output": {
+			"httpCode": 403,
+			"statusId": 401,
+			"statusStr": "Sanity-Check not initiated",
+			"compareResponse": false
+		}
+	},
+	{
+		"testName": "Add Tenant OpenRC with Infra Descritpor already added",
+		"endPoint": "/infra/rc/tenant",
+		"method": "PUT",
+		"removeSanityResult": true,
+		"input": "tenant-openrc-final",
+		"output": {
+			"httpCode": 200,
+			"statusId": 0,
+			"statusStr": "Request Successful",
+			"compareResponse": false
+		}
+	},
+	{
+		"testName": "Initiate Sanity Check successfully",
+		"endPoint": "/sanity-check",
+		"method": "POST",
+		"removeSanityResult": true,
+		"output": {
+			"httpCode": 202,
+			"compareResponse": false
+		}
+	},
+    {
+        "testName": "Initiate Sanity Check Again",
+        "endPoint": "/sanity-check",
+        "method": "POST",
+        "removeSanityResult": false,
+        "output": {
+            "httpCode": 403,
+            "statusId": 401,
+            "statusStr": "Request is already in progress",
+            "compareResponse": false
+        }
+    },
+	{
+		"testName": "Get Sanity Check Status after initiating Sanity Check",
+		"endPoint": "/sanity-check/status",
+		"method": "GET",
+		"removeSanityResult": false,
+		"output": {
+			"httpCode": 200,
+			"statusId": 0,
+			"statusStr": "Sanity-Check completed",
+			"compareResponse": false
+		}
+	},
+	{
+		"testName": "Get Sanity Check Results after initiating Sanity Check",
+		"endPoint": "/sanity-check/results",
+		"method": "GET",
+		"removeSanityResult": false,
+		"output": {
+			"httpCode": 200,
+			"statusId": 0,
+			"compareResponse": false
+		}
+	},
+	{
+		"testName": "Delete Infra Descriptor for Missing Newtork",
+		"endPoint": "/infra/descriptor",
+		"method": "DELETE",
+		"removeSanityResult": true,
+		"output": {
+			"httpCode": 200,
+			"statusId": 0,
+			"statusStr": "Request Successful",
+			"compareResponse": false
+		}
+	},
+	{
+		"testName": "Add Infra Descriptor for Missing Newtork",
+		"endPoint": "/infra/descriptor",
+		"method": "PUT",
+		"removeSanityResult": true,
+		"input": "id-sanity-missing-network.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 0,
+			"statusStr": "Request Successful",
+			"compareResponse": false
+		}
+	},
+	{
+		"testName": "Initiate Sanity Check for Missing Network",
+		"endPoint": "/sanity-check",
+		"method": "POST",
+		"removeSanityResult": true,
+		"output": {
+			"httpCode": 202,
+			"compareResponse": false
+		},
+		"testSleep": "yes"
+	},
+	{
+		"testName": "Get Sanity Check Results for Missing Network",
+		"endPoint": "/sanity-check/results",
+		"method": "GET",
+		"removeSanityResult": false,
+		"output": {
+			"httpCode": 200,
+			"statusId": 0,
+			"statusStr": "{\"Result\":{\"status_id\":0,\"status_str\":\"successful\"},\"Warning\":[{\"category\":\"networks\",\"description\":\"network df3712c8-d9b0-4812-b6a2-7043330ea0d0 of category access does not exist in OpenStack\"}]}",
+			"compareResponse": true
+		}
+	},
+	{
+		"testName": "Delete Infra Descriptor for Missing Newtork on DC",
+		"endPoint": "/infra/descriptor",
+		"method": "DELETE",
+		"removeSanityResult": true,
+		"output": {
+			"httpCode": 200,
+			"statusId": 0,
+			"statusStr": "Request Successful",
+			"compareResponse": false
+		}
+	},
+	{
+		"testName": "Add Infra Descriptor for Missing Newtork on DC",
+		"endPoint": "/infra/descriptor",
+		"method": "PUT",
+		"removeSanityResult": true,
+		"input": "id-sanity-missing-network-on-dc.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 0,
+			"statusStr": "Request Successful",
+			"compareResponse": false
+		}
+	},
+	{
+		"testName": "Initiate Sanity Check for Missing Network on DC",
+		"endPoint": "/sanity-check",
+		"method": "POST",
+		"removeSanityResult": true,
+		"output": {
+			"httpCode": 202,
+			"compareResponse": false
+		},
+		"testSleep": "yes"
+	},
+	{
+		"testName": "Get Sanity Check Results for Missing Network on DC",
+		"endPoint": "/sanity-check/results",
+		"method": "GET",
+		"removeSanityResult": false,
+		"output": {
+			"httpCode": 200,
+			"statusId": 0,
+			"statusStr": "{\"Result\":{\"status_id\":0,\"status_str\":\"successful\"},\"Warning\":[{\"category\":\"networks\",\"description\":\"network of category data is not attached to data_centre type node cn1\"}]}",
+			"compareResponse": true
+		}
+	},
+	{
+		"testName": "Delete Infra Descriptor for Exceeded Quota",
+		"endPoint": "/infra/descriptor",
+		"method": "DELETE",
+		"removeSanityResult": true,
+		"output": {
+			"httpCode": 200,
+			"statusId": 0,
+			"statusStr": "Request Successful",
+			"compareResponse": false
+		}
+	},
+	{
+		"testName": "Add Infra Descriptor for Exceeded Quota",
+		"endPoint": "/infra/descriptor",
+		"method": "PUT",
+		"removeSanityResult": true,
+		"input": "id-sanity-exceeded-quota.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 0,
+			"statusStr": "Request Successful",
+			"compareResponse": false
+		}
+	},
+	{
+		"testName": "Initiate Sanity Check for Exceeded Quota",
+		"endPoint": "/sanity-check",
+		"method": "POST",
+		"removeSanityResult": true,
+		"output": {
+			"httpCode": 202,
+			"compareResponse": false
+		},
+		"testSleep": "yes"
+	},
+	{
+		"testName": "Get Sanity Check Results for Exceeded Quota",
+		"endPoint": "/sanity-check/results",
+		"method": "GET",
+		"removeSanityResult": false,
+		"output": {
+			"httpCode": 200,
+			"statusId": 0,
+			"statusStr": "{\"Result\":{\"status_id\":0,\"status_str\":\"successful\"},\"Warning\":[{\"category\":\"quotas\",\"description\":\"cores are insufficient, required number of cores are: 49\"},{\"category\":\"quotas\",\"description\":\"ram is insufficient, required ram is: 89600\"},{\"category\":\"quotas\",\"description\":\"instances are insufficient, required number of instances are: 35\"}]}",
+			"compareResponse": true
+		}
+	},
+    {
+        "testName": "Delete Infra Descriptor for Missing Security Grp",
+        "endPoint": "/infra/descriptor",
+        "method": "DELETE",
+        "removeSanityResult": true,
+        "output": {
+            "httpCode": 200,
+            "statusId": 0,
+            "statusStr": "Request Successful",
+            "compareResponse": false
+        }
+    },
+    {
+        "testName": "Add Infra Descriptor for Missing Security Grp",
+        "endPoint": "/infra/descriptor",
+        "method": "PUT",
+        "removeSanityResult": true,
+        "input": "id-sanity-missing-security-grp.yml",
+        "output": {
+            "httpCode": 200,
+            "statusId": 0,
+            "statusStr": "Request Successful",
+            "compareResponse": false
+        }
+    },
+    {
+        "testName": "Initiate Sanity Check for Missing Security Grp",
+        "endPoint": "/sanity-check",
+        "method": "POST",
+        "removeSanityResult": true,
+        "output": {
+            "httpCode": 202,
+            "compareResponse": false
+        },
+        "testSleep": "yes"
+    },
+    {
+	        "testName": "Get Sanity Check Results for Missing Security Grp",
+        "endPoint": "/sanity-check/results",
+        "method": "GET",
+        "removeSanityResult": false,
+        "output": {
+            "httpCode": 200,
+            "statusId": 0,
+            "statusStr": "{\"Result\":{\"status_id\":0,\"status_str\":\"successful\"},\"Warning\":[{\"category\":\"security-groups\",\"description\":\"security group b05a3ab6-8de8-4b93-8d0d-b1d026a45e57 of category mgmt does not exist in OpenStack\"}]}",
+            "compareResponse": true
+        }
+    },
+    {
+        "testName": "Delete Tenant OpenRC After Complete Testing",
+        "endPoint": "/infra/rc/tenant",
+        "method": "DELETE",
+        "removeSanityResult": true,
+        "output": {
+            "httpCode": 200,
+            "statusId": 0,
+            "statusStr": "Request Successful",
+            "compareResponse": false
+        }
+    },
+    {
+        "testName": "Delete Admin OpenRC After Complete Testing",
+        "endPoint": "/infra/rc/admin",
+        "method": "DELETE",
+        "removeSanityResult": true,
+        "output": {
+            "httpCode": 200,
+            "statusId": 0,
+            "statusStr": "Request Successful",
+            "compareResponse": false
+        }
+    }
+]

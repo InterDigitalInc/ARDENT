@@ -1,0 +1,304 @@
+heat_template_version: 2017-02-24
+
+description: sr & clmc
+
+parameters:
+
+  security-group-mgmt:
+    type: string
+  security-group-sdnctrl:
+    type: string
+  security-group-msp:
+    type: string
+    
+  tmpl-name:
+    type: string
+  zone:
+    type: string
+  sr-flavor:
+    type: string
+  clmc-flavor:
+    type: string
+  sfemc-flavor:
+    type: string
+
+  base-key:
+    type: string
+
+  node-passwd:
+    type: string
+
+  infra-sdn-controller-ip:
+    type: string
+    
+  network-data:
+    type: string
+  network-sdnctrl:
+    type: string
+  network-mgmt:
+    type: string
+  network-msp:
+    type: string
+  network-lan:
+    type: string
+    
+  lan-cidr:
+    type: string
+  lan-dns-ip:
+    type: comma_delimited_list
+  lan-gw-ip:
+    type: string
+  lan-dhcp-ip:
+    type: string
+  lan-sr-ip-prefix:
+    type: string
+  lan-sr-ip-base:
+    type: string
+  lan-sr-ip-mask:
+    type: string
+  lan-sr-ip-osk-min:
+    type: string
+  lan-sr-ip-osk-max:
+    type: string
+
+  msp-ip-clmc:
+    type: string
+  msp-ip-sfemc:
+    type: string
+
+  sfid-parent-domain:
+    type: string
+  enable-ipv4-rules:
+    type: string
+  mtu:
+    type: string
+
+resources:
+
+  # note - no last newline for conf
+
+  sr-config:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        disable_root: false
+        password: { get_param: node-passwd }
+        chpasswd: { expire: false }
+        ssh_pwauth: true
+        manage_etc_hosts: true
+        timezone: Europe/London
+        runcmd:
+          - ovs-vsctl add-br flips
+          - ovs-vsctl set bridge flips protocols=OpenFlow13
+          - ovs-vsctl add-port flips eth1
+          - str_replace:
+              template: ovs-vsctl set-controller flips tcp:$addr:6653 
+              params:
+                $addr: { get_param: infra-sdn-controller-ip }
+          - ovs-vsctl set controller flips connection-mode=out-of-band
+          - str_replace:
+              template: echo "sdn.ctrl.addr=$(addr)" >> /usr/local/etc/flips.properties
+              params:
+                $(addr): { get_param: infra-sdn-controller-ip }
+          - echo > /usr/local/etc/flips.properties
+          - echo "sw.ifc=flips" >> /usr/local/etc/flips.properties
+          - echo "nap.ifc=eth0" >> /usr/local/etc/flips.properties
+          - str_replace:
+              template: echo "lan.dd=$(lan-dd-ip)" >> /usr/local/etc/flips.properties
+              params:
+                $(lan-dd-ip): { get_param: lan-gw-ip }
+          - str_replace:
+              template: echo "lan.gw=$(lan-gw-ip)" >> /usr/local/etc/flips.properties
+              params:
+                $(lan-gw-ip): { get_param: lan-gw-ip }
+          - str_replace:
+              template: echo "nap.pfix=$(pfix)" >> /usr/local/etc/flips.properties
+              params:
+                $(pfix): { get_param: lan-sr-ip-prefix }
+          - str_replace:
+              template: sed -i "s/mtu 1500/mtu $(mtu)/g" /etc/network/interfaces
+              params:
+                $(mtu): { get_param: mtu }
+          - str_replace:
+              template: echo "sw.ipv4=$(ipv4)" >> /usr/local/etc/flips.properties
+              params:
+                $(ipv4): { get_param: enable-ipv4-rules }
+          - reboot
+
+  sr-init:
+    type: OS::Heat::MultipartMime
+    properties:
+      parts:
+      - config: { get_resource: sr-config }
+
+  sr:
+    type: OS::Nova::Server
+    properties:
+      image: flame-sr
+      name:
+        str_replace:
+          template: $n-sr
+          params:
+            $n: { get_param: tmpl-name }
+      availability_zone: { get_param: zone }
+      flavor: { get_param: sr-flavor }
+      key_name: { get_param: base-key }
+      user_data_format: SOFTWARE_CONFIG
+      user_data: { get_resource: sr-init }
+      networks:
+      - network: { get_param: network-lan }
+      - network: { get_param: network-data }
+      - port: { get_resource: port-sr-sdnctrl }
+      - port: { get_resource: port-sr-mgmt }
+    depends_on: [ port-sr-sdnctrl, port-sr-mgmt, subnet-lan ]
+
+  port-sr-mgmt:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network-mgmt }
+      security_groups:
+        - { get_param: security-group-mgmt }
+
+  port-sr-sdnctrl:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network-sdnctrl }
+      security_groups:
+        - { get_param: security-group-sdnctrl }
+
+  subnet-lan:
+    type: OS::Neutron::Subnet
+    properties:
+      name: { get_param: tmpl-name }
+      network: { get_param: network-lan }
+      cidr: { get_param: lan-cidr }
+      gateway_ip: { get_param: lan-gw-ip }
+      dns_nameservers: { get_param: lan-dns-ip }
+      allocation_pools:
+      - start: { get_param: lan-sr-ip-osk-min }
+        end: { get_param: lan-sr-ip-osk-max }
+
+  # SFEMC
+
+  sfemc-config:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        disable_root: false
+        password: { get_param: node-passwd }
+        chpasswd: { expire: false }
+        ssh_pwauth: true
+        manage_etc_hosts: true
+        timezone: Europe/London
+        runcmd:
+          - systemctl stop tomcat8
+          - str_replace:
+              template: echo "lan.dd=$ip" > /usr/local/etc/flips.properties
+              params:
+                $ip: { get_param: lan-gw-ip }
+          - systemctl start tomcat8
+
+  sfemc-init:
+    type: OS::Heat::MultipartMime
+    properties:
+      parts:
+      - config: { get_resource: sfemc-config }
+
+  sfemc:
+    type: OS::Nova::Server
+    properties:
+      image: flame-sfemc
+      name:
+        str_replace:
+          template: $n-sfemc
+          params:
+            $n: { get_param: tmpl-name }
+      availability_zone: { get_param: zone }
+      flavor: { get_param: sfemc-flavor }
+      key_name: { get_param: base-key }
+      user_data_format: SOFTWARE_CONFIG
+      user_data: { get_resource: sfemc-init }
+      networks:
+      - network: { get_param: network-lan }
+      - port: { get_resource: port-sfemc-msp }
+      - port: { get_resource: port-sfemc-mgmt }
+    depends_on: [ port-sfemc-mgmt, port-sfemc-msp ]
+
+  port-sfemc-mgmt:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network-mgmt }
+      security_groups:
+        - { get_param: security-group-mgmt }
+
+  port-sfemc-msp:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network-msp }
+      fixed_ips:
+        - ip_address: { get_param: msp-ip-sfemc }
+      security_groups:
+        - { get_param: security-group-msp }
+
+  # CLMC
+
+  clmc-config:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        disable_root: false
+        password: { get_param: node-passwd }
+        chpasswd: { expire: false }
+        ssh_pwauth: true
+        manage_etc_hosts: true
+        timezone: Europe/London
+
+  clmc-init:
+    type: OS::Heat::MultipartMime
+    properties:
+      parts:
+      - config: { get_resource: clmc-config }
+
+  clmc:
+    type: OS::Nova::Server
+    properties:
+      image: flame-clmc
+      name:
+        str_replace:
+          template: $n-clmc
+          params:
+            $n: { get_param: tmpl-name }
+      availability_zone: { get_param: zone }
+      flavor: { get_param: clmc-flavor }
+      key_name: { get_param: base-key }
+      user_data_format: SOFTWARE_CONFIG
+      user_data: { get_resource: clmc-init }
+      networks:
+      - network: { get_param: network-lan }
+      - port: { get_resource: port-clmc-msp }
+      - port: { get_resource: port-clmc-mgmt }
+      - port: { get_resource: port-clmc-sdnctrl }
+    depends_on: [ port-clmc-sdnctrl, port-clmc-mgmt, port-clmc-msp, subnet-lan ]
+        
+  port-clmc-msp:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network-msp }
+      fixed_ips:
+        - ip_address: { get_param: msp-ip-clmc } 
+      security_groups:
+        - { get_param: security-group-msp }
+
+  port-clmc-mgmt:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network-mgmt }
+      security_groups:
+        - { get_param: security-group-mgmt }
+
+  port-clmc-sdnctrl:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network-sdnctrl }
+      security_groups:
+        - { get_param: security-group-sdnctrl }

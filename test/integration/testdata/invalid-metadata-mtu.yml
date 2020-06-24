@@ -1,0 +1,143 @@
+# Author: Se:bastian Robitzsch <sebastian.robitzsch@interdigital.com>
+
+compute_nodes: 
+  os-data-centre-1:
+    disk: 100
+    availability_zone: "nova"
+    name: "cn1"
+    networks: 
+      - "82eb8eee-df99-409e-b912-4fee4f1f0e37"
+      - "56eb8eee-df99-409e-b912-4fee4f1f03dd"
+      - "39eb8eee-df99-409e-b912-4fee4f1f56de"
+    ram: 1
+    tier: "data_centre"
+    vcpus: 1
+  os-edge-1:
+    disk: 200
+    availability_zone: "nova"
+    name: "cn2"
+    networks: 
+      - "88eb8eee-df99-409e-b912-4fee4f1f04ed"
+      - "76db8eee-df99-409e-b912-4fee4f1f09ed"
+      - "97eb8eee-df99-409e-b912-4fee4f1f05db"
+    ram: 2
+    tier: "edge"
+    vcpus: 2
+  os-edge-2:
+    disk: 300
+    availability_zone: "nova"
+    name: "cn3"
+    networks: 
+      - "53db8eee-df99-409e-b912-4fee4f1f09ff"
+      - "49eb8eee-df99-409e-b912-4fee4f1f08de"
+      - "66db8eee-df99-409e-b912-4fee4f1f55be"
+    ram: 3
+    tier: "far_edge"
+    vcpus: 3
+  os-mist-1:
+    disk: 400
+    availability_zone: "nova"
+    name: "cn4"
+    networks: 
+      - "76be8eee-df99-409e-b912-4fee4f1f9ed8"
+      - "88eb8eee-df99-409e-b912-4fee4f1f04ed"
+    ram: 4
+    tier: "mist"
+    vcpus: 4
+  os-edge-3:
+    disk: 500
+    availability_zone: "nova"
+    name: "cn5"
+    networks: 
+      - "97eb8eee-df99-409e-b912-4fee4f1f05db"
+      - "76db8eee-df99-409e-b912-4fee4f1f09ed"
+      - "49eb8eee-df99-409e-b912-4fee4f1f08de"
+      - "66db8eee-df99-409e-b912-4fee4f1f55be"
+    ram: 2
+    tier: "edge"
+    vcpus: 2
+  os-data-centre-2:
+    disk: 100
+    availability_zone: "nova"
+    name: "cn6"
+    networks:
+      - "82eb8eee-df99-409e-b912-4fee4f1f0e37"
+      - "56eb8eee-df99-409e-b912-4fee4f1f03dd"
+      - "39eb8eee-df99-409e-b912-4fee4f1f56de"
+    ram: 1
+    tier: "data_centre"
+    vcpus: 1
+
+networks:
+  flame-access1:
+    category: "access"
+    identifier: "82eb8eee-df99-409e-b912-4fee4f1f0e37"
+  flame-cluster-e1:
+    category: "cluster"
+    identifier: "56eb8eee-df99-409e-b912-4fee4f1f03dd"
+  flame-data1:
+    category: "data"
+    identifier: "39eb8eee-df99-409e-b912-4fee4f1f56de"
+  flame-mgmt:
+    category: "mgmt"
+    identifier: "88eb8eee-df99-409e-b912-4fee4f1f04ed"
+  flame-msp-dc1:
+    category: "msp"
+    identifier: "76db8eee-df99-409e-b912-4fee4f1f09ed"
+  flame-ps-dc1:
+    category: "ps"
+    identifier: "97eb8eee-df99-409e-b912-4fee4f1f05db"
+  flame-sdnctrl:
+    category: "sdnctrl"
+    identifier: "53db8eee-df99-409e-b912-4fee4f1f09ff"
+  flame-sia:
+    category: "sia"
+    identifier: "49eb8eee-df99-409e-b912-4fee4f1f08de"
+  flame-wan:
+    category: "wan"
+    identifier: "66db8eee-df99-409e-b912-4fee4f1f55be"
+  flame-access2:
+    category: "access"
+    identifier: "76be8eee-df99-409e-b912-4fee4f1f9ed8"
+
+subnets:
+  flame-sia1:
+    category: "sia"
+    identifier: "8e40ef98-52f4-41c6-89ad-f14f9698d768"
+  flame-sia2:
+    category: "sia"
+    identifier: "5f40ef98-52f4-41c6-89ad-f14f9698s232"
+  flame-sia3:
+    category: "sia"
+    identifier: "3d40ef98-52f4-41c6-89ad-f14f9698e075"
+
+security_groups:
+  flame-mgmt:
+    category: "mgmt"
+    identifier: "23e39fb0-626f-45f0-a35f-73ec0ca62d57"
+  flame-msp:
+    category: "msp"
+    identifier: "88d39fb0-626f-45f0-a35f-73ec0ca62d76"
+  flame-sdnctrl1:
+    category: "sdnctrl"
+    identifier: "63e39fb0-626f-45f0-a35f-73ec0ca62e97"
+  flame-sia:
+    category: "sia"
+    identifier: "11d39fb0-626f-45f0-a35f-73ec0ca62d64"
+  flame-wan:
+    category: "wan"
+    identifier: "70e39fb0-626f-45f0-a35f-73ec0ca62e86"
+  flame-sdnctrl2:
+    category: "sdnctrl"
+    identifier: "43be39fb0-626f-45f0-a35f-73ec0ca55e3"
+
+infrastructure_services: 
+  dns: "192.168.1.1" 
+  sdn_controller: "192.168.1.2"
+
+metadata: 
+  cidr: "192.168.0.0/16"
+  mtu: abc
+  tenant: "78eb8eee-df99-409e-b912-4fee4f1f0e45"
+  sia-ip-frontend: "192.168.1.3"
+  dhcp_agents: 7

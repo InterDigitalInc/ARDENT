@@ -1,0 +1,125 @@
+heat_template_version: 2017-02-24
+
+description: SR only which servers a LAN
+
+parameters:
+
+  name:
+    type: string
+  zone:
+    type: string
+  flavor:
+    type: string
+
+  base-key:
+    type: string
+
+  node-passwd:
+    type: string
+    
+  network-sia:
+    type: string
+  network-msp:
+    type: string
+
+  subnet-sia:
+    type: string
+  subnet-msp:
+    type: string
+
+  msp-ip-clmc:
+    type: string
+  msp-ip-sfemc:
+    type: string
+  msp-ip-moose:
+    type: string
+  msp-ip-nm:
+    type: string
+  
+  security-group-sia:
+  
+  security-group-sia:
+    type: string
+  security-group-msp:
+    type: string
+
+  sia-ip-frontend:
+    type: string
+  msp-ip-frontend:
+    type: string
+
+resources:
+
+  # note - no last newline for conf
+
+  frontend-config:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        disable_root: false
+        password: { get_param: node-passwd }
+        chpasswd: { expire: false }
+        ssh_pwauth: true
+        manage_etc_hosts: true
+        timezone: Europe/London
+        runcmd:
+          - str_replace:
+              template: sed -i "s/ORCHESTRATOR/$ip-addr-orch/g" /etc/nginx/nginx.conf
+              params:
+                $ip-addr-orch: { get_param: msp-ip-sfemc }
+          - str_replace:
+              template: sed -i "s/CLMC/$ip-addr-clmc/g" /etc/nginx/nginx.conf
+              params:
+                $ip-addr-clmc: { get_param: msp-ip-clmc }
+          - str_replace:
+              template: sed -i "s/REPOSITORY/$ip-addr-sfemc/g" /etc/nginx/nginx.conf
+              params:
+                $ip-addr-sfemc: { get_param: msp-ip-sfemc }
+          - str_replace:
+              template: sed -i "s/MOOSE/$ip-addr-moose/g" /etc/nginx/nginx.conf
+              params:
+                $ip-addr-moose: { get_param: msp-ip-moose }
+          - str_replace:
+              template: sed -i "s/NM/$ip-addr-nm/g" /etc/nginx/nginx.conf
+              params:
+                $ip-addr-nm: { get_param: msp-ip-nm }
+          - systemctl restart nginx
+
+  frontend-init:
+    type: OS::Heat::MultipartMime
+    properties:
+      parts:
+      - config: { get_resource: frontend-config }
+
+  frontend:
+    type: OS::Nova::Server
+    properties:
+      image: flame-frontend
+      name: { get_param: name }
+      availability_zone: { get_param: zone }
+      flavor: { get_param: flavor }
+      key_name: { get_param: base-key }
+      user_data_format: SOFTWARE_CONFIG
+      user_data: { get_resource: frontend-init }
+      networks:
+      - port: { get_resource: port-frontend-sia }
+      - port: { get_resource: port-frontend-msp }
+    depends_on: [ port-frontend-sia, port-frontend-msp ]
+
+  port-frontend-sia:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network-sia }
+      security_groups:
+        - { get_param: security-group-sia }
+      fixed_ips:
+        - ip_address: { get_param: sia-ip-frontend }
+        
+  port-frontend-msp:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network-msp }
+      security_groups:
+        - { get_param: security-group-msp }
+      fixed_ips:
+        - ip_address: { get_param: msp-ip-frontend }

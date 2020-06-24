@@ -1,0 +1,69 @@
+# ARDENT platform descriptor definitions
+#
+# Author: Sebastian Robitzsch <sebastian.robitzsch@interdigital.com>
+
+flavours:
+    required: false
+    description: Only required when host aggregates are being used
+    flavour:
+        identifier:
+            required: true
+            type: string
+            description: The OpenStack identifier of the flavour
+        host_aggregate:
+            required: true
+            type: string
+            description: The name of the host aggregate where the instance will be hosted on
+        component:
+            required: true
+            type: string
+            description: The name of the platform component this flavour is for (as per platform_components::component)
+            
+platform_components:
+    required: true
+    component:
+        name:
+            required: true
+            type: string
+            description: The name or acronym of the platform compontent
+        hot:
+            required: true
+            type: string
+            description: The name of the HOT prime uploaded to ARDENT in format <FILENAME>.yaml
+        tier:
+            required: false
+            type: array
+            type_schema: string
+            description: The tier types on which this component must reside. Note, if tier is being used compute_nodes and host_aggregates are prohibited
+            valid_values: [ "data_centre", "edge", "far_edge", "mist" ]
+        compute_nodes:
+            required: false
+            type: array
+            type_schema: string
+            description: The specific compute nodes this component must be deployed to. Note, if compute_nodes is being used, tier and host_aggregates are prohibited
+        host_aggregates:
+            required: false
+            type: array
+            type_schema: string
+            description: The specific host aggregates this component must be deployed to. Note, if host_aggregates is being used, tier and compute_nodes are prohibited
+        vcpus:
+            required: true
+            type: string
+            description: The number of vCPUs this component requires. If desired, it can be set to "max out" telling ARDENT to use all available resources on this compute node/host aggregate
+            valid_values: [ max_out, 0-9 ]
+        ram:
+            required: true
+            type: string
+            description: The amount of RAM this component requires. Unit in MB. If desired, it can be set to "max out" telling ARDENT to use all available resources on this compute node/host aggregate
+            valid_values: [ max_out, 0-9 ]
+            type: string
+        storage:
+            required: true
+            description: The disk size of this component requires. Unit in GB. If desired, it can be set to "max out" telling ARDENT to use all available resources on this compute node/host aggregate
+            valid_values: [ max_out, 0-9 ]
+ 
+ parameters:
+    required: true
+    type: array
+    type_schema: string
+    description: All additionally custom (but uniquely-named) HOT parameters across all uploaded HOT primes as key:value pairs.
