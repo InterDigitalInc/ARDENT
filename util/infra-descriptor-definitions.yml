@@ -1,0 +1,128 @@
+# ARDENT infrastructure descriptor definitions
+#
+# Author: Sebastian Robitzsch <sebastian.robitzsch@interdigital.com>
+
+host_aggregates:
+    required: false
+    host_aggregate:
+        name:
+            required: true
+            type: integer
+            description: The name of the host aggregate
+        vcpus:
+            required: true
+            type: integer
+            description: The number of virtual CPUs available on this host aggregate
+        ram:
+            required: true
+            type: integer
+            description: Unit in MB
+        volume_size:
+            required: true
+            type: integer
+            description: Unit in GB
+        networks:
+            required: true
+            type: array
+            type_schema: string
+            description: The list of networks this host aggregate has access to
+        tier:
+            required: true
+            type: string
+            description: The tier type of this host aggregate
+            valid_values: [ "data_centre", "edge", "far_edge", "mist" ]
+
+compute_nodes:
+    required: false
+    compute_node:
+        availability_zone:
+            required: true
+            type: string
+            description: The availability zone for this OpenStack compute node
+        name:
+            required: true
+            type: string
+            description: The name of the OpenStack compute node
+        vcpus:
+            required: true
+            type: integer
+        ram:
+            required: true
+            type: integer
+            description: Unit in MB
+        disk:
+            required: true
+            type: integer
+            description: Unit in GB
+        networks:
+            required: true
+            type: array
+            type_schema: string
+            description: The list of provider networks this compute node has access to
+        tier:
+            required: true
+            type: string
+            description: The tier type of this compute node
+            valid_values: [ "data_centre", "edge", "far_edge", "mist" ]
+            
+networks:
+    required: true
+    network:
+        identifier:
+            required: true
+            type: string
+        category:
+            required: true
+            type: string
+            description: An arbitrary but unique category name
+
+subnets:
+    required: false
+    subnet:
+        identifier:
+            required: true
+            type: string
+        category:
+            required: true
+            type: string
+            description: An arbitrary but unique category name
+
+security_groups:
+    required: false
+    security_group:
+        identifier:
+            required: true
+            type: string
+        category:
+            required: true
+            type: string
+
+infrastructure_services:
+    required: false
+    dns:
+        required: false
+        type: string
+        description: The IP address of the DNS of the infrastructure if provided by the infrastructure provider
+    sdn_controller:
+        required: false
+        type: string
+        description: The IP address of the SDN controller if provided by infrastructure provider
+
+metadata:
+    required: true
+    tenant:
+        required: true
+        type: string
+        description: The OpenStack tenant identifier that has been assigned to the platform provider 
+    cidr:
+        required: false
+        type: string
+        description: The CIDR for the entire LAN the platform provider can use
+    mtu:
+        required: false
+        type: integer
+        description: The MTU of the infrastructure for the ports of the platform which are not configured with DHCP clients
+    dhcp_agents:
+        required: true
+        type: integer
+        description: The number of DHCP agents configured in OpenStack that affect the number of available IP addresses for each subnet

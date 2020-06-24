@@ -1,0 +1,159 @@
+heat_template_version: 2017-02-24
+
+description: SR only which servers a LAN
+
+parameters:
+
+  name-prefix:
+    type: string
+  flavour:
+    type: string
+  keypair:
+    type: string
+  password:
+    type: string
+
+  mtu:
+    type: string
+  network-data:
+    type: string
+  network-mgmt:
+    type: string
+  network-sdnctrl:
+    type: string
+  network-access:
+    type: string
+  security-group-sdnctrl:
+    type: string
+  security-group-mgmt:
+    type: string
+  sdn-controller-ip:
+    type: string
+    
+  enable-ipv4-rules:
+    type: string
+  lan-cidr:
+    type: string
+  lan-dns-ip:
+    type: comma_delimited_list
+  lan-gw-ip:
+    type: string
+  lan-dhcp-ip:
+    type: string
+  lan-sr-ip-prefix:
+    type: string
+  lan-sr-ip-base:
+    type: string
+  lan-sr-ip-mask:
+    type: string
+  lan-sr-ip-osk-min:
+    type: string
+  lan-sr-ip-osk-max:
+    type: string
+  sfid-parent-domain:
+    type: string
+
+resources:
+
+  # note - no last newline for conf
+
+  sr-config:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        disable_root: false
+        password: { get_param: node-passwd }
+        chpasswd: { expire: false }
+        ssh_pwauth: true
+        manage_etc_hosts: true
+        timezone: Europe/London
+        runcmd:
+          - ovs-vsctl add-br flips
+          - ovs-vsctl set bridge flips protocols=OpenFlow13
+          - ovs-vsctl add-port flips eth1
+          - str_replace:
+              template: ovs-vsctl set-controller flips tcp:$addr:6653 
+              params:
+                $addr: { get_param: infra-sdn-controller-ip }
+          - ovs-vsctl set controller flips connection-mode=out-of-band
+          - str_replace:
+              template: echo "sdn.ctrl.addr=$(addr)" >> /usr/local/etc/flips.properties
+              params:
+                $(addr): { get_param: sdn-controller-ip }
+          - echo > /usr/local/etc/flips.properties
+          - echo "sw.ifc=flips" >> /usr/local/etc/flips.properties
+          - echo "nap.ifc=eth0" >> /usr/local/etc/flips.properties
+          - str_replace:
+              template: echo "lan.dd=$(lan-dd-ip)" >> /usr/local/etc/flips.properties
+              params:
+                $(lan-dd-ip): { get_param: lan-gw-ip }
+          - str_replace:
+              template: echo "lan.gw=$(lan-gw-ip)" >> /usr/local/etc/flips.properties
+              params:
+                $(lan-gw-ip): { get_param: lan-gw-ip }
+          - str_replace:
+              template: echo "nap.pfix=$(pfix)" >> /usr/local/etc/flips.properties
+              params:
+                $(pfix): { get_param: lan-sr-ip-prefix }
+          - str_replace:
+              template: sed -i "s/mtu 1500/mtu $(mtu)/g" /etc/network/interfaces
+              params:
+                $(mtu): { get_param: mtu }
+          - str_replace:
+              template: echo "sw.ipv4=$(ipv4)" >> /usr/local/etc/flips.properties
+              params:
+                $(ipv4): { get_param: enable-ipv4-rules }
+          - reboot
+
+  sr-init:
+    type: OS::Heat::MultipartMime
+    properties:
+      parts:
+      - config: { get_resource: sr-config }
+
+  sr:
+    type: OS::Nova::Server
+    properties:
+      image: flame-sr
+      name:
+        str_replace:
+          template: $prefix-sr
+          params:
+            $prefix: { get_param: name-prefix }
+      availability_zone: { get_param: zone }
+      flavor: { get_param: flavour }
+      key_name: { get_param: keypair }
+      user_data_format: SOFTWARE_CONFIG
+      user_data: { get_resource: sr-init }
+      networks:
+      - network: { get_param: network-access }
+      - network: { get_param: network-data }
+      - port: { get_resource: sr-port-sdnctrl }
+      - port: { get_resource: sr-port-mgmt }
+    depends_on: [ sr-port-mgmt, sr-port-sdnctrl ]
+
+  sr-port-sdnctrl:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network-sdnctrl }
+      security_groups:
+        - { get_param: security-group-sdnctrl }
+
+  sr-port-mgmt:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network-mgmt }
+      security_groups:
+        - { get_param: security-group-mgmt }
+        
+  subnet-sr-lan:
+    type: OS::Neutron::Subnet
+    properties:
+      name: { get_param: network-access }
+      network: { get_param: network-access }
+      cidr: { get_param: lan-cidr }
+      gateway_ip: { get_param: lan-gw-ip }
+      dns_nameservers: { get_param: lan-dns-ip }
+      allocation_pools:
+      - start: { get_param: lan-sr-ip-osk-min }
+        end: { get_param: lan-sr-ip-osk-max }

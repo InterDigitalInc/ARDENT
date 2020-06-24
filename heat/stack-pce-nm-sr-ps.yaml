@@ -1,0 +1,466 @@
+heat_template_version: 2017-02-24
+
+description: PCE-SFEMC, SR & PSs
+
+parameters:
+
+  tmpl-name:
+    type: string
+  zone:
+    type: string
+  sr-flavor:
+    type: string
+  ps-flavor:
+    type: string
+  pce-flavor:
+    type: string
+  nm-flavor:
+    type: string
+
+  base-key:
+    type: string
+  security-group-mgmt:
+    type: string
+  security-group-sdnctrl:
+    type: string
+  security-group-msp:
+    type: string
+  security-group-wan:
+    type: string
+
+  node-passwd:
+    type: string
+
+  infra-sdn-controller-ip:
+    type: string
+  infra-dns-ip:
+    type: string
+    
+  network-data:
+    type: string
+  network-wan:
+    type: string
+  network-sdnctrl:
+    type: string
+  network-mgmt:
+    type: string
+  network-msp:
+    type: string
+  network-lan:
+    type: string
+
+  subnet-msp:
+    type: string
+ 
+  lan-dns-ip:
+    type: comma_delimited_list
+  lan-dhcp-ip:
+    type: string
+  lan-gw-ip:
+    type: string
+  lan-cidr:
+    type: string
+  lan-prefix:
+    type: string
+  lan-mask:
+    type: string
+  lan-sr-ip-prefix:
+    type: string
+  lan-sr-ip-base:
+    type: string
+  lan-sr-ip-mask:
+    type: string
+  lan-sr-ip-osk-min:
+    type: string
+  lan-sr-ip-osk-max:
+    type: string
+
+  msp-ip-cidr:
+    type: string
+  msp-ip-min:
+    type: string
+  msp-ip-max:
+    type: string
+  msp-ip-nm:
+    type: string
+
+  sfid-parent-domain:
+    type: string
+  
+  enable-ipv4-rules:
+    type: string
+
+  mtu:
+    type: string
+
+resources:
+
+  pce-config:                                                                                                               
+    type: OS::Heat::CloudConfig                                                                                             
+    properties:                                                                                                             
+      cloud_config:                                                                                                         
+        disable_root: false                                                                                                 
+        password: { get_param: node-passwd }                                                                                
+        chpasswd: { expire: false }                                                                                         
+        ssh_pwauth: true                                                                                                    
+        manage_etc_hosts: true                                                                                              
+        timezone: Europe/London                                                                                             
+        runcmd:                                                                                                             
+          - ovs-vsctl add-br flips                                                                                          
+          - ovs-vsctl set bridge flips protocols=OpenFlow13                                                                 
+          - ovs-vsctl add-port flips eth1
+          - str_replace:                                                                                                    
+              template: ovs-vsctl set-controller flips tcp:$addr:6653                                                       
+              params:                                                                                                       
+                $addr: { get_param: infra-sdn-controller-ip }                                                                 
+          - ovs-vsctl set controller flips connection-mode=out-of-band                                                      
+          - echo "sw.ifc=flips" > /usr/local/etc/flips.properties
+          - str_replace:
+              template: echo "sdn.ctrl.addr=$(addr)" >> /usr/local/etc/flips.properties
+              params:
+                $(addr): { get_param: infra-sdn-controller-ip }                                                                 
+          - str_replace:
+              template: echo "lan.dd=$(dns)" >> /usr/local/etc/flips.properties
+              params:
+                $(dns): { get_param: lan-gw-ip }
+          - str_replace:
+              template: echo "lan.gw=$(gw-ip)" >> /usr/local/etc/flips.properties
+              params:
+                $(gw-ip): { get_param: lan-gw-ip }
+          - str_replace:
+              template: echo "sf.dns=$(domain)" >> /usr/local/etc/flips.properties
+              params:
+                $(domain): { get_param: lan-gw-ip }
+          - str_replace:
+              template: echo "sw.ipv4=$(ipv4)" >> /usr/local/etc/flips.properties
+              params:
+                $(ipv4): { get_param: enable-ipv4-rules }
+          - echo "sf.ifc=eth0" >> /usr/local/etc/flips.properties
+          - str_replace:
+              template: sed -i "s/mtu 1500/mtu $(mtu)/g" /etc/network/interfaces
+              params:
+                $(mtu): { get_param: mtu }
+          - reboot                                                                                                   
+
+  pce-init:                                                                                                                 
+    type: OS::Heat::MultipartMime                                                                                           
+    properties:                                                                                                             
+      parts:                                                                                                                
+      - config: { get_resource: pce-config }                                                                                
+
+  pce:                                                                                                                      
+    type: OS::Nova::Server                                                                                                  
+    properties:                                                                                                             
+      image: flame-pce                                                                                                        
+      name:
+        str_replace:
+          template: $n-pce
+          params:
+            $n: { get_param: tmpl-name }
+      availability_zone: { get_param: zone }                                                                            
+      flavor: { get_param: pce-flavor }                                                                                     
+      key_name: { get_param: base-key }                                                                                     
+      user_data_format: SOFTWARE_CONFIG                                                                                     
+      user_data: { get_resource: pce-init }                                                                                 
+      networks:                                                                                                             
+      - network: { get_param: network-lan } 
+      - network: { get_param: network-data }                                                                    
+      - port: { get_resource: port-pce-sdnctrl }
+      - port: { get_resource: port-pce-mgmt }                                                                               
+    depends_on: [ port-pce-mgmt, port-pce-sdnctrl ]
+
+  port-pce-mgmt:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network-mgmt }
+      security_groups: 
+        - { get_param: security-group-mgmt }
+
+  port-pce-sdnctrl:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network-sdnctrl }
+      security_groups:
+        - { get_param: security-group-sdnctrl }
+
+  # NM
+  nm-config:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        disable_root: false
+        password: { get_param: node-passwd }
+        chpasswd: { expire: false }
+        ssh_pwauth: true
+        manage_etc_hosts: true
+        timezone: Europe/London
+        runcmd:
+          - ovs-vsctl add-br flips
+          - ovs-vsctl set bridge flips protocols=OpenFlow13
+          - ovs-vsctl add-port flips eth1
+          - str_replace:
+              template: ovs-vsctl set-controller flips tcp:$addr:6653
+              params:
+                $addr: { get_param: infra-sdn-controller-ip }
+          - ovs-vsctl set controller flips connection-mode=out-of-band
+          - echo "sw.ifc=flips" > /usr/local/etc/flips.properties
+          - str_replace:
+              template: echo "sdn.ctrl.addr=$(addr)" >> /usr/local/etc/flips.properties
+              params:
+                $(addr): { get_param: infra-sdn-controller-ip }
+          - str_replace:
+              template: echo "lan.dd=$(dns)" >> /usr/local/etc/flips.properties
+              params:
+                $(dns): { get_param: lan-gw-ip }
+          - str_replace:
+              template: echo "sw.ipv4=$(ipv4)" >> /usr/local/etc/flips.properties
+              params:
+                $(ipv4): { get_param: enable-ipv4-rules }
+          - echo "sf.ifc=eth0" >> /usr/local/etc/flips.properties
+          - str_replace:
+              template: sed -i "s/mtu 1500/mtu $(mtu)/g" /etc/network/interfaces
+              params:
+                $(mtu): { get_param: mtu }
+          - reboot
+
+  nm-init:
+    type: OS::Heat::MultipartMime
+    properties:
+      parts:
+      - config: { get_resource: pce-config }
+
+  nm:
+    type: OS::Nova::Server
+    properties:
+      image: flame-nm
+      name:
+        str_replace:
+          template: $n-nm
+          params:
+            $n: { get_param: tmpl-name }
+      availability_zone: { get_param: zone }
+      flavor: { get_param: nm-flavor }
+      key_name: { get_param: base-key }
+      user_data_format: SOFTWARE_CONFIG
+      user_data: { get_resource: nm-init }
+      networks:
+      - network: { get_param: network-lan }
+      - network: { get_param: network-data }
+      - port: { get_resource: port-nm-sdnctrl }
+      - port: { get_resource: port-nm-mgmt }
+      - port: { get_resource: port-nm-msp }
+    depends_on: [ port-nm-mgmt, port-nm-sdnctrl, port-nm-msp ]
+
+  port-nm-mgmt:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network-mgmt }
+      security_groups:
+        - { get_param: security-group-mgmt }
+
+  port-nm-sdnctrl:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network-sdnctrl }
+      security_groups:
+        - { get_param: security-group-sdnctrl }
+
+  port-nm-msp:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network-msp }
+      security_groups:
+        - { get_param: security-group-msp }
+      fixed_ips:
+        - ip_address: { get_param: msp-ip-nm }
+    depends_on: [ subnet-nm-msp ]
+
+  subnet-nm-msp:
+    type: OS::Neutron::Subnet
+    properties:
+      name: { get_param: subnet-msp }
+      network: { get_param: network-msp }
+      cidr: { get_param: msp-ip-cidr }
+      allocation_pools:
+      - start: { get_param: msp-ip-min }
+        end: { get_param: msp-ip-max }
+
+  # SR
+  sr-config:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        disable_root: false
+        password: { get_param: node-passwd }
+        chpasswd: { expire: false }
+        ssh_pwauth: true
+        manage_etc_hosts: true
+        timezone: Europe/London
+        runcmd:
+          - ovs-vsctl add-br flips
+          - ovs-vsctl set bridge flips protocols=OpenFlow13
+          - ovs-vsctl add-port flips eth1
+          - str_replace:
+              template: ovs-vsctl set-controller flips tcp:$addr:6653 
+              params:
+                $addr: { get_param: infra-sdn-controller-ip }
+          - ovs-vsctl set controller flips connection-mode=out-of-band
+          - echo > /usr/local/etc/flips.properties
+          - echo "sw.ifc=flips" >> /usr/local/etc/flips.properties
+          - echo "nap.ifc=eth0" >> /usr/local/etc/flips.properties
+          - str_replace:
+              template: echo "lan.gw=$(lan-gw-ip)" >> /usr/local/etc/flips.properties
+              params:
+                $(lan-gw-ip): { get_param: lan-gw-ip }
+          - str_replace:
+              template: echo "lan.dd=$(lan-dd-ip)" >> /usr/local/etc/flips.properties
+              params:
+                $(lan-dd-ip): { get_param: lan-gw-ip }
+          - str_replace:
+              template: echo "nap.pfix=$(pfix)" >> /usr/local/etc/flips.properties
+              params:
+                $(pfix): { get_param: lan-sr-ip-prefix }
+          - str_replace:
+              template: sed -i "s/mtu 1500/mtu $(mtu)/g" /etc/network/interfaces
+              params:
+                $(mtu): { get_param: mtu }
+          - str_replace:
+              template: echo "sw.ipv4=$(ipv4)" >> /usr/local/etc/flips.properties
+              params:
+                $(ipv4): { get_param: enable-ipv4-rules }
+          - reboot
+
+  sr-init:
+    type: OS::Heat::MultipartMime
+    properties:
+      parts:
+      - config: { get_resource: sr-config }
+
+  sr:
+    type: OS::Nova::Server
+    properties:
+      image: flame-sr
+      name: 
+        str_replace:
+          template: $n-sr
+          params:
+            $n: { get_param: tmpl-name }
+      availability_zone: { get_param: zone }
+      flavor: { get_param: sr-flavor }
+      key_name: { get_param: base-key }
+      user_data_format: SOFTWARE_CONFIG
+      user_data: { get_resource: sr-init }
+      networks:
+      - network: { get_param: network-lan }
+      - network: { get_param: network-data }
+      - port: { get_resource: port-sr-sdnctrl }
+      - port: { get_resource: port-sr-mgmt }
+    depends_on: [ port-sr-mgmt, port-sr-sdnctrl, subnet-lan ]
+
+  port-sr-mgmt:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network-mgmt }
+      security_groups:
+        - { get_param: security-group-mgmt }
+        
+  port-sr-sdnctrl:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network-sdnctrl }
+      security_groups:
+        - { get_param: security-group-sdnctrl }
+        
+  subnet-lan:
+    type: OS::Neutron::Subnet
+    properties:
+      name: { get_param: tmpl-name }
+      network: { get_param: network-lan }
+      cidr: { get_param: lan-cidr }
+      gateway_ip: { get_param: lan-gw-ip }
+      dns_nameservers: { get_param: lan-dns-ip }
+      allocation_pools:
+      - start: { get_param: lan-sr-ip-osk-min }
+        end: { get_param: lan-sr-ip-osk-max }
+
+  # Platform services (All in one)  
+
+  ps-config:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        disable_root: false
+        password: { get_param: node-passwd }
+        chpasswd: { expire: false }
+        ssh_pwauth: true
+        manage_etc_hosts: true
+        timezone: Europe/London
+        runcmd:
+          - str_replace:
+              template: echo "lan.pfix=$(pfix)" > /usr/local/etc/flips.properties
+              params:
+                $(pfix): { get_param: lan-prefix }
+          - str_replace:
+              template: echo "lan.gw=$(ipgw)" >> /usr/local/etc/flips.properties
+              params:
+                $(ipgw): { get_param: lan-gw-ip }
+          - str_replace:
+              template: echo "lan.dd=$(ip-dd-ip)" >> /usr/local/etc/flips.properties
+              params:
+                $(ip-dd-ip): { get_param: lan-gw-ip }
+          - str_replace:
+              template: sed -i 's/^.*forwarders {.*$/\tforwarders {$(infra-dns-ip);};\n\n&/' /etc/bind/named.conf.options
+              params:
+                $(infra-dns-ip): { get_param: infra-dns-ip }
+          - echo "lan.dmin=50" >> /usr/local/etc/flips.properties
+          - echo "lan.dmax=253" >> /usr/local/etc/flips.properties
+          - systemctl restart tomcat8
+
+  ps-init:
+    type: OS::Heat::MultipartMime
+    properties:
+      parts:
+      - config: { get_resource: ps-config }
+
+  ps:
+    type: OS::Nova::Server
+    properties:
+      image: flame-ps
+      name:
+        str_replace:
+          template: $n-ps
+          params:
+            $n: { get_param: tmpl-name }
+      availability_zone: { get_param: zone }
+      flavor: { get_param: ps-flavor }
+      key_name: { get_param: base-key }
+      user_data_format: SOFTWARE_CONFIG
+      user_data: { get_resource: ps-init }
+      networks:
+      - port: { get_resource: port-ps-wan }
+      - port: { get_resource: port-ps-lan }
+      - port: { get_resource: port-ps-mgmt }
+    depends_on: [ port-ps-wan, port-ps-lan, port-ps-mgmt, sr ]
+
+  port-ps-wan:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network-wan }
+      security_groups:
+        - { get_param: security-group-wan }
+
+  port-ps-lan:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network-lan }
+      fixed_ips:
+        - ip_address: { get_param: lan-gw-ip }
+    depends_on: subnet-lan
+
+  port-ps-mgmt:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network-mgmt }
+      security_groups:
+        - { get_param: security-group-mgmt }
+

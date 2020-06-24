@@ -1,0 +1,128 @@
+heat_template_version: 2017-02-24
+
+description: moose
+
+parameters:
+
+  name:
+    type: string
+  zone:
+    type: string
+  flavor:
+    type: string
+
+  base-key:
+    type: string
+  security-group-mgmt:
+    type: string
+  security-group-sdnctrl:
+    type: string
+  security-group-msp:
+    type: string
+
+  infra-sdn-controller-ip:
+    type: string
+
+  node-passwd:
+    type: string
+  
+  network-mgmt:
+    type: string
+  network-sdnctrl:
+    type: string
+  network-data:
+    type: string
+  network-msp:
+    type: string
+
+  msp-ip-moose:
+    type: string
+
+  enable-ipv4-rules:
+    type: string
+
+  mtu:
+    type: string
+
+resources:
+
+  moose-config:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        disable_root: false
+        password: { get_param: node-passwd }
+        chpasswd: { expire: false }
+        ssh_pwauth: true
+        manage_etc_hosts: true
+        timezone: Europe/London
+        runcmd:
+          - ovs-vsctl add-br flips
+          - ovs-vsctl set bridge flips protocols=OpenFlow13
+          - ovs-vsctl add-port flips eth2
+          - str_replace:
+              template: ovs-vsctl set-controller flips tcp:$addr
+              params:
+                $addr: { get_param: infra-sdn-controller-ip }
+          - ovs-vsctl set controller flips connection-mode=out-of-band
+          - echo > /usr/local/etc/flips.properties
+          - echo "sw.ifc=flips" >> /usr/local/etc/flips.properties
+          - str_replace:
+              template: echo "sdn.ctrl.addr=$(addr)" >> /usr/local/etc/flips.properties
+              params:
+                $(addr): { get_param: infra-sdn-controller-ip }
+          - str_replace:
+              template: sed -i "s/mtu 1500/mtu $(mtu)/g" /etc/network/interfaces
+              params:
+                $(mtu): { get_param: mtu }
+          - str_replace:
+              template: echo "sw.ipv4=$(ipv4)" >> /usr/local/etc/flips.properties
+              params:
+                $(ipv4): { get_param: enable-ipv4-rules }
+          - reboot
+
+  moose-init:
+    type: OS::Heat::MultipartMime
+    properties:
+      parts:
+      - config: { get_resource: moose-config }
+
+  moose:
+    type: OS::Nova::Server
+    properties:
+      image: flame-moose
+      name: { get_param: name }
+      availability_zone: { get_param: zone }
+      flavor: { get_param: flavor }
+      key_name: { get_param: base-key }
+      user_data_format: SOFTWARE_CONFIG
+      user_data: { get_resource: moose-init }
+      networks:
+      - port: { get_resource: moose-port-mgmt }
+      - port: { get_resource: moose-port-sdnctrl }
+      - network: { get_param: network-data }
+      - port: { get_resource: port-moose-msp }
+    depends_on: [ moose-port-mgmt, moose-port-sdnctrl, port-moose-msp ]
+
+  moose-port-mgmt:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network-mgmt}
+      security_groups:
+        - { get_param: security-group-mgmt }
+
+  moose-port-sdnctrl:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network-sdnctrl }
+      security_groups:
+        - { get_param: security-group-sdnctrl }
+
+  port-moose-msp:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network-msp }
+      security_groups:
+        - { get_param: security-group-msp }
+      fixed_ips:
+        - ip_address: { get_param: msp-ip-moose }

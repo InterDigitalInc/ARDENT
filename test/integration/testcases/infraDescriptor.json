@@ -1,0 +1,98 @@
+[{
+		"testName": "Delete Infra Descriptor",
+		"endPoint": "/infra/descriptor",
+		"method": "DELETE",
+		"output": {
+			"httpCode": 200
+		}
+	},
+	{
+		"testName": "Add Infra Descriptor-Missing Descriptor",
+		"endPoint": "/infra/descriptor",
+		"method": "PUT",
+		"output": {
+			"httpCode": 403,
+			"statusId": 1,
+			"statusStr": "Payload expected in the Request"
+		}
+	},
+	{
+		"testName": "Add Infra Descriptor",
+		"endPoint": "/infra/descriptor",
+		"method": "PUT",
+		"input": "infra-descriptor.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 0,
+			"statusStr": "Request Successful"
+		}
+	},
+	{
+		"testName": "Add Infra Descriptor again",
+		"endPoint": "/infra/descriptor",
+		"method": "PUT",
+		"input": "infra-descriptor-modified.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 0,
+			"statusStr": "Request Successful"
+		}
+	},
+	{
+		"testName": "Add TenantRC",
+		"endPoint": "/infra/rc/tenant",
+		"method": "PUT",
+		"input": "tenant-openrc-final"
+	},
+	{
+		"testName": "Initiate Sanity Check",
+		"endPoint": "/sanity-check",
+		"method": "POST",
+		"output": {
+			"httpCode": 202
+		},
+		"testSleep": "yes"
+	},
+	{
+		"testName": "Delete Infra Descriptor with Payload",
+		"endPoint": "/infra/descriptor",
+		"method": "DELETE",
+		"input": "infra-descriptor.yml",
+		"output": {
+			"httpCode": 403,
+            "statusId": 1,
+            "statusStr": "Payload not expected in the Request"
+		}
+	},
+    {
+        "testName": "Delete TenantRC",
+        "endPoint": "/infra/rc/tenant",
+        "method": "DELETE",
+        "statusId": 0,
+         "statusStr": "Request Successful"
+    },
+    {
+        "testName": "Delete Infra Descriptor without TenantRC",
+        "endPoint": "/infra/descriptor",
+        "method": "DELETE",
+        "output": {
+            "httpCode": 200,
+            "statusId": 151,
+            "statusStr": "Failed to locate tenant-openrc"
+        }
+    },
+    {
+        "testName": "Add TenantRC Again",
+        "endPoint": "/infra/rc/tenant",
+        "method": "PUT",
+        "input": "tenant-openrc-final"
+    },
+	{
+		"testName": "Delete Infra Descriptor without Payload",
+		"endPoint": "/infra/descriptor",
+		"method": "DELETE",
+		"output": {
+			"httpCode": 200
+		}
+	}
+]

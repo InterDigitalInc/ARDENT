@@ -1,0 +1,154 @@
+[
+	{
+        "testName": "Delete AdminRC with Payload",
+        "endPoint": "/infra/rc/admin",
+        "method": "DELETE",
+		"input": "testdata/admin-openrc-initial",
+        "output": {
+            "httpCode":  403,
+            "statusId":  1,
+            "statusStr": "Payload not expected in the Request"
+        }
+    },
+	{
+		"testName": "Delete Non Existent AdminRC",
+		"endPoint": "/infra/rc/admin",
+		"method": "DELETE",
+		"output": {
+            "httpCode":  403,
+            "statusId":  101,
+            "statusStr": "Failed to locate admin-openrc"
+        }
+	},
+	{
+        "testName": "Add AdminRC without input",
+        "endPoint": "/infra/rc/admin",
+        "method": "PUT",
+        "output": {
+            "httpCode": 403,
+            "statusId": 1,
+            "statusStr": "Payload expected in the Request"
+        }
+    },
+	{
+		"testName": "Add AdminRC",
+		"endPoint": "/infra/rc/admin",
+		"method": "PUT",
+		"input": "testdata/admin-openrc-initial",
+		"output": {
+			"httpCode": 200,
+			"statusId": 0,
+			"statusStr": "Request Successful",
+			"compareResponse": true
+		}
+	},
+    {
+        "testName": "Add AdminRC twice consecutively",
+        "endPoint": "/infra/rc/admin",
+        "method": "PUT",
+        "input": "testdata/admin-openrc-initial",
+        "output": {
+            "httpCode": 200,
+            "statusId": 0,
+            "statusStr": "Request Successful"
+        }
+    },
+	{
+        "testName": "Delete AdminRC",
+        "endPoint": "/infra/rc/admin",
+        "method": "DELETE",
+        "output": {
+            "httpCode":  200,
+            "statusId":  0,
+            "statusStr": "Request Successful"
+        }
+    },
+	{
+        "testName": "Add AdminRC Again",
+        "endPoint": "/infra/rc/admin",
+        "method": "PUT",
+        "input": "testdata/admin-openrc-final",
+        "output": {
+            "httpCode": 200,
+            "statusId": 0,
+            "statusStr": "Request Successful",
+            "compareResponse": true
+        }
+    },
+	{
+        "testName": "Delete TenantRC with Payload",
+        "endPoint": "/infra/rc/tenant",
+        "method": "DELETE",
+		"input": "testdata/admin-openrc-initial",
+        "output": {
+            "httpCode": 403,
+            "statusId": 1,
+            "statusStr": "Payload not expected in the Request"
+        }
+    },
+	{
+		"testName": "Delete Non Existent TenantRC",
+		"endPoint": "/infra/rc/tenant",
+		"method": "DELETE",
+		"output": {
+			"httpCode": 403,
+			"statusId": 101,
+			"statusStr": "Failed to locate tenant-openrc"
+		}
+	},
+	{
+        "testName": "Add TenantRC without input",
+        "endPoint": "/infra/rc/tenant",
+        "method": "PUT",
+        "output": {
+            "httpCode": 403,
+            "statusId": 1,
+            "statusStr": "Payload expected in the Request"
+        }
+    },
+	{
+		"testName": "Add TenantRC",
+		"endPoint": "/infra/rc/tenant",
+		"method": "PUT",
+		"input": "testdata/tenant-openrc-initial",
+		"output": {
+			"httpCode": 200,
+			"statusId": 0,
+			"statusStr": "Request Successful",
+			"compareResponse": true
+		}
+	},
+    {
+        "testName": "Add TenantRC twice consecutively",
+        "endPoint": "/infra/rc/tenant",
+        "method": "PUT",
+        "input": "testdata/tenant-openrc-initial",
+        "output": {
+            "httpCode": 200,
+            "statusId": 0,
+            "statusStr": "Request Successful"
+        }
+    },
+	{
+        "testName": "Delete TenantRC",
+        "endPoint": "/infra/rc/tenant",
+        "method": "DELETE",
+        "output": {
+            "httpCode": 200,
+            "statusId": 0,
+            "statusStr": "Request Successful"
+        }
+    },
+	{
+        "testName": "Add TenantRC Again",
+        "endPoint": "/infra/rc/tenant",
+        "method": "PUT",
+        "input": "testdata/tenant-openrc-final",
+        "output": {
+            "httpCode": 200,
+            "statusId": 0,
+            "statusStr": "Request Successful",
+            "compareResponse": true
+        }
+    }
+]

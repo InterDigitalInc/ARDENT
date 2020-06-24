@@ -1,0 +1,521 @@
+heat_template_version: 2017-02-24
+
+description: FLAME platform with clusters and platform services
+
+parameters:
+
+  keypair:
+    type: string
+  security-group-mgmt:
+    type: string
+  security-group-sdnctrl:
+    type: string
+  security-group-sia:
+    type: string  
+  security-group-msp:
+    type: string
+  security-group-wan:
+    type: string
+  flavor-pce:
+    type: string
+  flavor-sfemc:
+    type: string
+  flavor-sr:
+    type: string
+  flavor-moose:
+    type: string
+  flavor-ps:
+    type: string
+  flavor-cluster-data-centre:
+    type: string
+  flavor-cluster-edge:
+    type: string
+  flavor-cluster-far-edge:
+    type: string
+  flavor-clmc:
+    type: string
+  flavor-frontend:
+    type: string
+
+  node-passwd:
+    type: string
+
+  sfid-parent-domain:
+    type: string
+    
+  network-sdnctrl:
+    type: string
+  network-sia:
+    type: string
+  network-msp:
+    type: string
+  network-mgmt:
+    type: string
+  network-wan1:
+    type: string
+    
+  infra-sdn-controller-ip:
+    type: string
+
+  lan-dhcp-ip:
+    type: string
+  lan-gw-ip:
+    type: string
+  lan-dns-ip:
+    type: string
+  lan-cidr:
+    type: string
+  lan-prefix:
+    type: string
+  lan-mask:
+    type: string
+
+  lan-sr1-ip-cidr:
+    type: string
+  lan-sr1-ip-prefix:
+    type: string
+  lan-sr1-ip-base:
+    type: string
+  lan-sr1-ip-mask:
+    type: string
+  lan-sr1-ip-osk-min:
+    type: string
+  lan-sr1-ip-osk-max:
+    type: string
+  lan-sr1-ip-isc-min:
+    type: string
+  lan-sr1-ip-isc-max:
+    type: string
+
+  lan-sr2-ip-cidr:
+    type: string
+  lan-sr2-ip-prefix:
+    type: string
+  lan-sr2-ip-base:
+    type: string
+  lan-sr2-ip-mask:
+    type: string
+  lan-sr2-ip-osk-min:
+    type: string
+  lan-sr2-ip-osk-max:
+    type: string
+  lan-sr2-ip-isc-min:
+    type: string
+  lan-sr2-ip-isc-max:
+    type: string
+    
+  lan-sr3-ip-cidr:
+    type: string
+  lan-sr3-ip-prefix:
+    type: string
+  lan-sr3-ip-base:
+    type: string
+  lan-sr3-ip-mask:
+    type: string
+  lan-sr3-ip-osk-min:
+    type: string
+  lan-sr3-ip-osk-max:
+    type: string
+  lan-sr3-ip-isc-min:
+    type: string
+  lan-sr3-ip-isc-max:
+    type: string
+
+  lan-sr4-ip-cidr:
+    type: string
+  lan-sr4-ip-prefix:
+    type: string
+  lan-sr4-ip-base:
+    type: string
+  lan-sr4-ip-mask:
+    type: string
+  lan-sr4-ip-osk-min:
+    type: string
+  lan-sr4-ip-osk-max:
+    type: string
+  lan-sr4-ip-isc-min:
+    type: string
+  lan-sr4-ip-isc-max:
+    type: string
+
+  lan-sr5-ip-cidr:
+    type: string
+  lan-sr5-ip-prefix:
+    type: string
+  lan-sr5-ip-base:
+    type: string
+  lan-sr5-ip-mask:
+    type: string
+  lan-sr5-ip-osk-min:
+    type: string
+  lan-sr5-ip-osk-max:
+    type: string
+  lan-sr5-ip-isc-min:
+    type: string
+  lan-sr5-ip-isc-max:
+    type: string
+
+  lan-sr6-ip-cidr:
+    type: string
+  lan-sr6-ip-prefix:
+    type: string
+  lan-sr6-ip-base:
+    type: string
+  lan-sr6-ip-mask:
+    type: string
+  lan-sr6-ip-osk-min:
+    type: string
+  lan-sr6-ip-osk-max:
+    type: string
+  lan-sr6-ip-isc-min:
+    type: string
+  lan-sr6-ip-isc-max:
+    type: string
+
+  lan-sr7-ip-cidr:
+    type: string
+  lan-sr7-ip-prefix:
+    type: string
+  lan-sr7-ip-base:
+    type: string
+  lan-sr7-ip-mask:
+    type: string
+  lan-sr7-ip-osk-min:
+    type: string
+  lan-sr7-ip-osk-max:
+    type: string
+  lan-sr7-ip-isc-min:
+    type: string
+  lan-sr7-ip-isc-max:
+    type: string
+
+  lan-sr8-ip-cidr:
+    type: string
+  lan-sr8-ip-prefix:
+    type: string
+  lan-sr8-ip-base:
+    type: string
+  lan-sr8-ip-mask:
+    type: string
+  lan-sr8-ip-osk-min:
+    type: string
+  lan-sr8-ip-osk-max:
+    type: string
+  lan-sr8-ip-isc-min:
+    type: string
+  lan-sr8-ip-isc-max:
+    type: string
+
+  lan-sr9-ip-cidr:
+    type: string
+  lan-sr9-ip-prefix:
+    type: string
+  lan-sr9-ip-base:
+    type: string
+  lan-sr9-ip-mask:
+    type: string
+  lan-sr9-ip-osk-min:
+    type: string
+  lan-sr9-ip-osk-max:
+    type: string
+  lan-sr9-ip-isc-min:
+    type: string
+  lan-sr9-ip-isc-max:
+    type: string
+
+  lan-sr10-ip-cidr:
+    type: string
+  lan-sr10-ip-prefix:
+    type: string
+  lan-sr10-ip-base:
+    type: string
+  lan-sr10-ip-mask:
+    type: string
+  lan-sr10-ip-osk-min:
+    type: string
+  lan-sr10-ip-osk-max:
+    type: string
+  lan-sr10-ip-isc-min:
+    type: string
+  lan-sr10-ip-isc-max:
+    type: string
+
+  lan-sr11-ip-cidr:
+    type: string
+  lan-sr11-ip-prefix:
+    type: string
+  lan-sr11-ip-base:
+    type: string
+  lan-sr11-ip-mask:
+    type: string
+  lan-sr11-ip-osk-min:
+    type: string
+  lan-sr11-ip-osk-max:
+    type: string
+  lan-sr11-ip-isc-min:
+    type: string
+  lan-sr11-ip-isc-max:
+    type: string
+
+  msp-ip-cidr:
+    type: string
+  msp-ip-min:
+    type: string
+  msp-ip-max:
+    type: string
+
+  sia-ip-frontend:
+    type: string
+  msp-ip-sfrepo:
+    type: string
+  msp-ip-sfemc:
+    type: string
+  msp-ip-clmc:
+    type: string
+  msp-ip-moose:
+    type: string
+  msp-ip-frontend:
+    type: string
+
+  mtu:
+    type: string
+
+resources:
+
+  dc1-pce1-sr1-ps1:
+    type: ../stack-pce-sr-ps.yaml
+    properties:
+      security-group-mgmt: { get_param: security-group-mgmt }
+      security-group-sdnctrl: { get_param: security-group-sdnctrl }
+      security-group-msp: { get_param: security-group-msp }
+      security-group-wan: { get_param: security-group-wan }
+      tmpl-name: dc1-pce1-sr1-ps1
+      zone: nova:os-data-centre-1
+      pce-flavor: { get_param: flavor-pce }
+      sr-flavor: { get_param: flavor-sr }
+      ps-flavor: { get_param: flavor-ps }
+      base-key: { get_param: keypair }
+      node-passwd: { get_param: node-passwd }
+      infra-sdn-controller-ip: { get_param: infra-sdn-controller-ip }
+      disable-ipv6-flow-label-rules: 0
+      network-data: flame-data1
+      network-wan: { get_param: network-wan1 }
+      network-sdnctrl: { get_param: network-sdnctrl }
+      network-mgmt: { get_param: network-mgmt }
+      network-msp: flame-msp-dc1
+      network-lan: flame-ps-dc1
+      subnet-msp: flame-msp
+      mtu: { get_param: mtu }
+      lan-cidr: { get_param: lan-cidr }
+      lan-prefix: { get_param: lan-prefix }
+      lan-dns-ip: { get_param: lan-dns-ip }
+      lan-gw-ip: { get_param: lan-gw-ip }
+      lan-dhcp-ip: { get_param: lan-dhcp-ip }
+      lan-mask: { get_param: lan-mask }
+      lan-sr-ip-prefix: { get_param: lan-sr1-ip-prefix }
+      lan-sr-ip-base: { get_param: lan-sr1-ip-base }
+      lan-sr-ip-mask: { get_param: lan-sr1-ip-mask }
+      lan-sr-ip-osk-min: { get_param: lan-sr1-ip-osk-min }
+      lan-sr-ip-osk-max: { get_param: lan-sr1-ip-osk-max }
+      lan-sr-ip-isc-min: { get_param: lan-sr1-ip-isc-min }
+      lan-sr-ip-isc-max: { get_param: lan-sr1-ip-isc-max }
+      msp-ip-cidr: { get_param: msp-ip-cidr }
+      msp-ip-min: { get_param: msp-ip-min }
+      msp-ip-max: { get_param: msp-ip-max }
+      msp-ip-sfrepo: { get_param: msp-ip-sfrepo }
+      sfid-parent-domain: { get_param: sfid-parent-domain }
+      
+  dc1-sr2-clmc1-sfemc1:
+    type: ../stack-sr-clmc-sfemc.yaml
+    properties:
+      security-group-mgmt: { get_param: security-group-mgmt }
+      security-group-sdnctrl: { get_param: security-group-sdnctrl }
+      security-group-msp: { get_param: security-group-msp }
+      tmpl-name: dc1-sr2-clmc1-sfemc1
+      zone: nova:os-data-centre-1
+      sr-flavor: { get_param: flavor-sr }
+      clmc-flavor: { get_param: flavor-clmc }
+      sfemc-flavor: { get_param: flavor-sfemc }
+      base-key: { get_param: keypair }
+      node-passwd: { get_param: node-passwd }
+      infra-sdn-controller-ip: { get_param: infra-sdn-controller-ip }
+      network-data: flame-data1
+      network-sdnctrl: { get_param: network-sdnctrl }
+      network-mgmt: { get_param: network-mgmt }
+      network-msp: flame-msp-dc1
+      network-lan: flame-clmc-dc1
+      mtu: { get_param: mtu }
+      lan-cidr: { get_param: lan-cidr }
+      lan-dns-ip: { get_param: lan-dns-ip }
+      lan-gw-ip: { get_param: lan-gw-ip }
+      lan-dhcp-ip: { get_param: lan-dhcp-ip }
+      lan-sr-ip-prefix: { get_param: lan-sr2-ip-prefix }
+      lan-sr-ip-base: { get_param: lan-sr2-ip-base }
+      lan-sr-ip-mask: { get_param: lan-sr2-ip-mask }
+      lan-sr-ip-osk-min: { get_param: lan-sr2-ip-osk-min }
+      lan-sr-ip-osk-max: { get_param: lan-sr2-ip-osk-max }
+      msp-ip-clmc: { get_param: msp-ip-clmc }
+      msp-ip-sfemc: { get_param: msp-ip-sfemc }
+      sfid-parent-domain: { get_param: sfid-parent-domain }
+    depends_on: dc1-pce1-sr1-ps1
+
+  dc1-frontend1:
+    type: ../stack-frontend.yaml
+    properties:
+      security-group-sia: { get_param: security-group-sia }
+      security-group-msp: { get_param: security-group-msp }
+      name: dc1-frontend1
+      zone: nova:os-data-centre-1
+      flavor: { get_param: flavor-frontend }
+      base-key: { get_param: keypair }
+      node-passwd: { get_param: node-passwd }
+      network-sia: { get_param: network-sia }
+      network-msp: flame-msp-dc1
+      subnet-sia: flame-sia
+      subnet-msp: flame-msp
+      sia-ip-frontend: { get_param: sia-ip-frontend }
+      msp-ip-frontend: { get_param: msp-ip-frontend }
+      msp-ip-sfrepo: { get_param: msp-ip-sfrepo }
+      msp-ip-sfemc: { get_param: msp-ip-sfemc }
+      msp-ip-clmc: { get_param: msp-ip-clmc }
+      msp-ip-moose: { get_param: msp-ip-moose }
+    depends_on: dc1-sr2-clmc1-sfemc1
+  
+  dc1-moose1:
+    type: ../stack-moose.yaml
+    properties:
+      security-group-mgmt: { get_param: security-group-mgmt }
+      security-group-sdnctrl: { get_param: security-group-sdnctrl }
+      security-group-msp: { get_param: security-group-msp }
+      name: dc1-moose1
+      zone: nova:os-data-centre-1
+      flavor: { get_param: flavor-moose }
+      base-key: { get_param: keypair }
+      node-passwd: { get_param: node-passwd }
+      infra-sdn-controller-ip: { get_param: infra-sdn-controller-ip }
+      network-data: flame-data1
+      network-sdnctrl: { get_param: network-sdnctrl }
+      network-mgmt: { get_param: network-mgmt }
+      network-msp: flame-msp-dc1
+      msp-ip-moose: { get_param: msp-ip-moose }
+      mtu: { get_param: mtu }
+    depends_on: dc1-frontend1
+    
+#### SRs and their clusters
+
+  dc2-sr1-cluster1:
+    type: ../stack-sr-cluster.yaml
+    properties:
+      security-group-mgmt: { get_param: security-group-mgmt }
+      security-group-sdnctrl: { get_param: security-group-sdnctrl }
+      tmpl-name: dc2-sr1-cluster1
+      zone: nova:os-data-centre-2
+      sr-flavor: { get_param: flavor-sr }
+      cluster-flavor: { get_param: flavor-cluster-data-centre }
+      base-key: { get_param: keypair }
+      node-passwd: { get_param: node-passwd }
+      infra-sdn-controller-ip: { get_param: infra-sdn-controller-ip }
+      network-data: flame-data1
+      network-sdnctrl: { get_param: network-sdnctrl }
+      network-mgmt: { get_param: network-mgmt }
+      network-lan: flame-cluster-dc2
+      mtu: { get_param: mtu }
+      lan-cidr: { get_param: lan-cidr }
+      lan-dns-ip: { get_param: lan-dns-ip }
+      lan-gw-ip: { get_param: lan-gw-ip }
+      lan-dhcp-ip: { get_param: lan-dhcp-ip }
+      lan-sr-ip-prefix: { get_param: lan-sr3-ip-prefix }
+      lan-sr-ip-base: { get_param: lan-sr3-ip-base }
+      lan-sr-ip-mask: { get_param: lan-sr3-ip-mask }
+      lan-sr-ip-osk-min: { get_param: lan-sr3-ip-osk-min }
+      lan-sr-ip-osk-max: { get_param: lan-sr3-ip-osk-max }
+      sfid-parent-domain: { get_param: sfid-parent-domain }
+    depends_on: dc1-moose1
+    
+  e1-sr1-cluster1:
+    type: ../stack-sr-cluster.yaml
+    properties:
+      security-group-mgmt: { get_param: security-group-mgmt }
+      security-group-sdnctrl: { get_param: security-group-sdnctrl }
+      tmpl-name: e1-sr1-cluster1
+      zone: nova:os-edge-1
+      sr-flavor: { get_param: flavor-sr }
+      cluster-flavor: { get_param: flavor-cluster-edge }
+      base-key: { get_param: keypair }
+      node-passwd: { get_param: node-passwd }
+      infra-sdn-controller-ip: { get_param: infra-sdn-controller-ip }
+      network-data: flame-data1
+      network-sdnctrl: { get_param: network-sdnctrl }
+      network-mgmt: { get_param: network-mgmt }
+      network-lan: flame-cluster-e1
+      mtu: { get_param: mtu }
+      lan-cidr: { get_param: lan-cidr }
+      lan-dns-ip: { get_param: lan-dns-ip }
+      lan-gw-ip: { get_param: lan-gw-ip }
+      lan-dhcp-ip: { get_param: lan-dhcp-ip }
+      lan-sr-ip-prefix: { get_param: lan-sr4-ip-prefix }
+      lan-sr-ip-base: { get_param: lan-sr4-ip-base }
+      lan-sr-ip-mask: { get_param: lan-sr4-ip-mask }
+      lan-sr-ip-osk-min: { get_param: lan-sr4-ip-osk-min }
+      lan-sr-ip-osk-max: { get_param: lan-sr4-ip-osk-max }
+      sfid-parent-domain: { get_param: sfid-parent-domain }
+    depends_on: dc2-sr1-cluster1
+    
+  e2-sr1-cluster1:
+    type: ../stack-sr-cluster.yaml
+    properties:
+      security-group-mgmt: { get_param: security-group-mgmt }
+      security-group-sdnctrl: { get_param: security-group-sdnctrl }
+      tmpl-name: e2-sr1-cluster1
+      zone: nova:os-edge-2
+      sr-flavor: { get_param: flavor-sr }
+      cluster-flavor: { get_param: flavor-cluster-edge }
+      base-key: { get_param: keypair }
+      node-passwd: { get_param: node-passwd }
+      infra-sdn-controller-ip: { get_param: infra-sdn-controller-ip }
+      network-data: flame-data1
+      network-sdnctrl: { get_param: network-sdnctrl }
+      network-mgmt: { get_param: network-mgmt }
+      network-lan: flame-cluster-e2
+      mtu: { get_param: mtu }
+      lan-cidr: { get_param: lan-cidr }
+      lan-dns-ip: { get_param: lan-dns-ip }
+      lan-gw-ip: { get_param: lan-gw-ip }
+      lan-dhcp-ip: { get_param: lan-dhcp-ip }
+      lan-sr-ip-prefix: { get_param: lan-sr5-ip-prefix }
+      lan-sr-ip-base: { get_param: lan-sr5-ip-base }
+      lan-sr-ip-mask: { get_param: lan-sr5-ip-mask }
+      lan-sr-ip-osk-min: { get_param: lan-sr5-ip-osk-min }
+      lan-sr-ip-osk-max: { get_param: lan-sr5-ip-osk-max }
+      sfid-parent-domain: { get_param: sfid-parent-domain }
+    depends_on: e1-sr1-cluster1
+
+  e3-sr1-cluster1:
+    type: ../stack-sr-cluster.yaml
+    properties:
+      security-group-mgmt: { get_param: security-group-mgmt }
+      security-group-sdnctrl: { get_param: security-group-sdnctrl }
+      tmpl-name: e3-sr1-cluster1
+      zone: nova:os-edge-3
+      sr-flavor: { get_param: flavor-sr }
+      cluster-flavor: { get_param: flavor-cluster-edge }
+      base-key: { get_param: keypair }
+      node-passwd: { get_param: node-passwd }
+      infra-sdn-controller-ip: { get_param: infra-sdn-controller-ip }
+      network-data: flame-data1
+      network-sdnctrl: { get_param: network-sdnctrl }
+      network-mgmt: { get_param: network-mgmt }
+      network-lan: flame-cluster-e3
+      mtu: { get_param: mtu }
+      lan-cidr: { get_param: lan-cidr }
+      lan-dns-ip: { get_param: lan-dns-ip }
+      lan-gw-ip: { get_param: lan-gw-ip }
+      lan-dhcp-ip: { get_param: lan-dhcp-ip }
+      lan-sr-ip-prefix: { get_param: lan-sr6-ip-prefix }
+      lan-sr-ip-base: { get_param: lan-sr6-ip-base }
+      lan-sr-ip-mask: { get_param: lan-sr6-ip-mask }
+      lan-sr-ip-osk-min: { get_param: lan-sr6-ip-osk-min }
+      lan-sr-ip-osk-max: { get_param: lan-sr6-ip-osk-max }
+      sfid-parent-domain: { get_param: sfid-parent-domain }
+    depends_on: e2-sr1-cluster1
+    

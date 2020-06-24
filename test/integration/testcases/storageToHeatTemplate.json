@@ -1,0 +1,57 @@
+[
+    {
+		"testName": "Successful-Overwrite Sanity Result",
+		"input": "heat-descriptor.yml",
+		"output": {
+			"httpCode": 200,
+			"writeSanityResult": true,
+			"statusId": 0,
+			"statusStr": "Request Successful",
+			"heatYml": "hot.yaml"
+		}
+	},
+	{
+		"testName": "Successful-Swapped DC Index",
+		"input": "heat-descriptor-swapped-dc.yml",
+		"output": {
+			"httpCode": 200,
+			"writeSanityResult": true,
+			"statusId": 0,
+			"statusStr": "Request Successful",
+			"heatYml": "hot-swapped-dc.yaml"
+		}
+	},
+  	{
+		"testName": "Successful-Insufficient DC Resources, Half Clmc",
+		"input": "heat-descriptor-half-clmc.yml",
+		"output": {
+			"httpCode": 200,
+			"writeSanityResult": true,
+			"statusId": 0,
+			"statusStr": "Request Successful",
+			"heatYml": "hot-half-clmc.yaml"
+		}
+	},
+  	{
+		"testName": "Successful-Single DC",
+		"input": "heat-descriptor-single-dc.yml",
+		"output": {
+			"httpCode": 200,
+			"writeSanityResult": true,
+			"statusId": 0,
+			"statusStr": "Request Successful",
+			"heatYml": "hot-single-dc.yaml"
+		}
+	},
+  	{
+		"testName": "Successful-Generate Sanity Result",
+		"input": "id-sanity.yml",
+		"output": {
+			"httpCode": 200,
+			"writeSanityResult": false,
+			"statusId": 0,
+			"statusStr": "Request Successful",
+			"heatYml": "stack-flame-platform.yaml"
+		}
+	}
+]

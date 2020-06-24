@@ -1,0 +1,155 @@
+[
+    {
+        "testName": "Launch stack without payload",
+        "endPoint": "/stack/create",
+        "method": "POST",
+        "output": {
+            "httpCode": 403,
+            "statusId": 1,
+            "statusStr": "Payload is expected in the Request"
+        }
+    },
+    {
+        "testName": "Launch stack with invalid payload",
+        "endPoint": "/stack/create",
+        "method": "POST",
+        "input": "{\"name\":\"testStack}",
+        "output": {
+            "httpCode": 500,
+            "statusId": 11,
+            "statusStr": "Failed to decode json received in request body"
+        }
+    },
+    {
+        "testName": "Launch stack without stack name",
+        "endPoint": "/stack/create",
+        "method": "POST",
+        "input": "{\"name\":\"\"}",
+        "output": {
+            "httpCode": 403,
+            "statusId": 201,
+            "statusStr": "Empty stack name"
+        }
+    },
+    {
+        "testName": "Launch stack without tenant openrc",
+        "endPoint": "/stack/create",
+        "method": "POST",
+        "input": "{\"name\":\"testStack\"}",
+		"removeSanityResult": true,
+        "output": {
+            "httpCode": 200,
+            "statusId": 251,
+            "statusStr": "Failed to locate tenant-openrc"
+        }
+    },
+    {
+        "testName": "Launch stack without heat template",
+        "endPoint": "/stack/create",
+        "method": "POST",
+        "input": "{\"name\":\"testStack\"}",
+        "output": {
+            "httpCode": 200,
+            "statusId": 253,
+            "statusStr": "HEAT template is not generated"
+        }
+    },
+	{
+		"testName": "Launch stack with invalid heat template",
+		"endPoint": "/stack/create",
+		"method": "POST",
+        "input": "{\"name\":\"testStack\"}",
+		"output": {
+			"httpCode": 200,
+			"statusId": 254,
+			"statusStr": "Empty field(s) found in HEAT template"
+		}
+	},
+    {
+        "testName": "Delete stack without payload",
+        "endPoint": "/stack/delete",
+        "method": "POST",
+        "output": {
+            "httpCode": 403,
+            "statusId": 1,
+            "statusStr": "Payload is expected in the Request"
+        }
+    },
+    {
+        "testName": "Delete stack with invalid payload",
+        "endPoint": "/stack/delete",
+        "method": "POST",
+        "input": "{\"name\":\"testStack}",
+        "output": {
+            "httpCode": 500,
+            "statusId": 11,
+            "statusStr": "Failed to decode json received in request body"
+        }
+    },
+    {
+        "testName": "Delete stack without stack name",
+        "endPoint": "/stack/delete",
+        "method": "POST",
+        "input": "{\"name\":\"\"}",
+        "output": {
+            "httpCode": 403,
+            "statusId": 201,
+            "statusStr": "Empty stack name"
+        }
+    },
+    {
+        "testName": "Delete stack without tenant openrc",
+        "endPoint": "/stack/delete",
+        "method": "POST",
+        "input": "{\"name\":\"testStack\"}",
+        "removeSanityResult": true,
+        "output": {
+            "httpCode": 200,
+            "statusId": 251,
+            "statusStr": "Failed to locate tenant-openrc"
+        }
+    },
+    {
+        "testName": "Delete non-existent stack",
+        "endPoint": "/stack/delete",
+        "method": "POST",
+        "input": "{\"name\":\"stackTest\"}",
+        "output": {
+            "httpCode": 200,
+            "statusId": 255,
+            "statusStr": "Stack does not exist"
+        }
+    },
+    {
+        "testName": "Get stack status with payload",
+        "endPoint": "/stack/status/{testStack}",
+        "method": "GET",
+        "input": "{\"name\":\"testStack\"}",
+        "output": {
+            "httpCode": 403,
+            "statusId": 1,
+            "statusStr": "Payload not expected in the Request"
+        }
+    },
+    {
+        "testName": "Get stack status without tenant openrc",
+        "endPoint": "/stack/status/{testStack}",
+        "method": "GET",
+        "removeSanityResult": true,
+        "output": {
+            "httpCode": 200,
+            "statusId": 251,
+            "statusStr": "Failed to locate tenant-openrc"
+        }
+    },
+    {
+        "testName": "Get status for non-existent stack",
+        "endPoint": "/stack/status/{stackTest}",
+        "method": "GET",
+        "output": {
+            "httpCode": 200,
+            "statusId": 255,
+            "statusStr": "Stack does not exist"
+        }
+    }
+]

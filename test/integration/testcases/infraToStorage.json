@@ -1,0 +1,390 @@
+[
+	{
+		"testName": "Invalid Infra Descriptor",
+		"input": "invalid-infra-descriptor.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "Failed to unmarshal infra descriptor"
+		}
+	},
+	{
+		"testName": "Infra Descriptor With Extra Key",
+		"input": "extra-key-infra-descriptor.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "Failed to unmarshal infra descriptor"
+		}
+	},
+	{
+	 	"testName": "Empty Compute Node Networks",
+		"input": "empty-compute-node-networks.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "networks is empty or not present for compute node in infra descriptor"
+		}
+	},
+	{
+		"testName": "Invalid Compute Node RAM",
+		"input": "invalid-compute-node-ram.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "Failed to unmarshal infra descriptor"
+		}
+	},
+	{
+		"testName": "Invalid Compute Node Disk",
+		"input": "invalid-compute-node-disk.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "Failed to unmarshal infra descriptor"
+		}
+	},
+	{
+		"testName": "Empty Compute Node Vcpus",
+		"input": "empty-compute-node-vcpus.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "vcpus is empty or not present for compute node in infra descriptor"
+		}
+	},
+	{
+		"testName": "Invalid Compute Node Vcpus",
+		"input": "invalid-compute-node-vcpus.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "Failed to unmarshal infra descriptor"
+		}
+	},
+	{
+		"testName": "Empty Compute Nodes",
+		"input": "empty-compute-nodes.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "compute_nodes is empty or not present in infra descriptor"
+		}
+	},
+	{
+		"testName": "Empty Compute Node RAM",
+		"input": "empty-compute-node-ram.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "ram is empty or not present for compute node in infra descriptor"
+		}
+	},
+	{
+		"testName": "Empty Compute Node Availability Zone",
+		"input": "empty-compute-node-availability-zone.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "availability_zone is empty or not present for compute node in infra descriptor"
+		}
+	},
+	{
+		"testName": "Empty Compute Node Name",
+		"input": "empty-compute-node-name.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "name is empty or not present for compute node in infra descriptor"
+		}
+	},
+	{
+		"testName": "Empty Compute Node Disk",
+		"input": "empty-compute-node-disk.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "disk is empty or not present for compute node in infra descriptor"
+		}
+	},
+	{
+		"testName": "Empty Compute Node Tier",
+		"input": "empty-compute-node-tier.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "tier is empty or not present for compute node in infra descriptor"
+		}
+	},
+	{
+		"testName": "Invalid Compute Node Tier",
+		"input": "invalid-compute-node-tier.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "tier is not a valid value for compute node in infra descriptor"
+		}
+	},
+	{
+		"testName": "Invalid Network Category",
+		"input": "invalid-network-category.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "category is not a valid value for network in infra descriptor"
+		}
+	},
+	{
+		"testName": "Empty Networks",
+		"input": "empty-networks.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "networks is empty or not present in infra descriptor"
+		}
+	},
+	{
+		"testName": "Empty Network Identifier",
+		"input": "empty-network-identifier.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "identifier is empty or not present for network in infra descriptor"
+		}
+	},
+	{
+		"testName": "Empty Network Category",
+		"input": "empty-network-category.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "category is empty or not present for network in infra descriptor"
+		}
+	},
+	{
+		"testName": "Empty Subnets",
+		"input": "empty-subnets.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "subnets is empty or not present in infra descriptor"
+		}
+	},
+	{
+		"testName": "Empty Subnet Identifier",
+		"input": "empty-subnet-identifier.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "identifier is empty or not present for subnet in infra descriptor"
+		}
+	},
+	{
+		"testName": "Empty Subnet Category",
+		"input": "empty-subnet-category.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "category is empty or not present for subnet in infra descriptor"
+		}
+	},
+	{
+		"testName": "Invalid Subnet Category",
+		"input": "invalid-subnet-category.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "category is not a valid value for subnet in infra descriptor"
+		}
+	},
+	{
+		"testName": "Invalid Security Group Category",
+		"input": "invalid-security-group-category.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "category is not a valid value for security group in infra descriptor"
+		}
+	},
+	{
+		"testName": "Empty Security Groups",
+		"input": "empty-security-groups.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "security_groups is empty or not present in infra descriptor"
+		}
+	},
+	{
+		"testName": "Empty Security Group Identifier",
+		"input": "empty-security-group-identifier.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "identifier is empty or not present for security group in infra descriptor"
+		}
+	},
+	{
+		"testName": "Empty Security Group Category",
+		"input": "empty-security-group-category.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "category is empty or not present for security group in infra descriptor"
+		}
+	},
+	{
+		"testName": "Empty Infra-Services SdnController",
+		"input": "empty-infra-services-sdn.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "sdn_controller is empty or not present in infra descriptor"
+		}
+	},
+	{
+		"testName": "Invalid Infra-Services SdnController",
+		"input": "invalid-infra-services-sdn.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "sdn_controller is not in proper IP format in infra descriptor"
+		}
+	},
+	{
+		"testName": "Empty Infra-Services DNS",
+		"input": "empty-infra-services-dns.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "dns is empty or not present in infra descriptor"
+		}
+	},
+	{
+		"testName": "Invalid Infra-Services DNS",
+		"input": "invalid-infra-services-dns.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "dns is not in proper IP format in infra descriptor"
+		}
+	},
+	{
+		"testName": "Empty Metadata Tenant",
+		"input": "empty-metadata-tenant.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "tenant is empty or not present in infra descriptor"
+		}
+	},
+	{
+		"testName": "Empty Metadata Mtu",
+		"input": "empty-metadata-mtu.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "mtu is empty or not present in infra descriptor"
+		}
+	},
+	{
+		"testName": "Invalid Metadata Mtu",
+		"input": "invalid-metadata-mtu.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "Failed to unmarshal infra descriptor"
+		}
+	},
+	{
+		"testName": "Empty Metadata Cidr",
+		"input": "empty-metadata-cidr.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "cidr is empty or not present in infra descriptor"
+		}
+	},
+	{
+		"testName": "Invalid Metadata Cidr",
+		"input": "invalid-metadata-cidr.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "cidr is not in proper CIDR format in infra descriptor"
+		}
+	},
+	{
+		"testName": "Empty Metadata Sia-IP-Frontend",
+		"input": "empty-metadata-sia-ip-frontend.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "sia-ip-frontend is empty or not present in infra descriptor"
+		}
+	},
+	{
+		"testName": "Invalid Metadata Sia-IP-Frontend",
+		"input": "invalid-metadata-sia-ip-frontend.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 152,
+			"statusStr": "sia-ip-frontend is not in proper IP format in infra descriptor"
+		}
+	},
+    {
+        "testName": "Invalid Metadata IPv4 Rules",
+        "input": "invalid-metadata-ipv4-rules.yml",
+        "output": {
+            "httpCode": 200,
+            "statusId": 152,
+            "statusStr": "ipv4-rules is not a valid value in infra descriptor"
+        }
+    },
+	{
+        "testName": "Empty Metadata IPv4 Rules",
+        "input": "empty-metadata-ipv4-rules.yml",
+        "output": {
+            "httpCode": 200,
+            "statusId": 0,
+            "statusStr": "Request Successful"
+        }
+    },
+	{
+        "testName": "Empty Metadata DHCP Agents",
+        "input": "empty-metadata-dhcp-agents.yml",
+        "output": {
+            "httpCode": 200,
+            "statusId": 0,
+            "statusStr": "Request Successful"
+        }
+    },
+    {
+        "testName": "Invalid Metadata DHCP Agents",
+        "input": "invalid-metadata-dhcp-agents.yml",
+        "output": {
+            "httpCode": 200,
+            "statusId": 152,
+            "statusStr": "Failed to unmarshal infra descriptor"
+        }
+    },
+	{
+        "testName": "Delete Infra Descriptor",
+        "endPoint": "/infra/descriptor",
+        "method": "DELETE",
+        "output": {
+            "httpCode": 200,
+            "statusId": 0,
+            "statusStr": "Request Successful"
+        }
+    },
+	{
+		"testName": "Successful",
+		"input": "infra-descriptor.yml",
+		"output": {
+			"httpCode": 200,
+			"statusId": 0,
+			"statusStr": "Request Successful"
+		}
+	}
+]

@@ -1,2 +1,2 @@
-# ARDENT
-Agnostic platfoRm DEploymeNt orchesTrator (ARDENT)
+# Introduction
+Automated platfoRm DEploymeNt Toolchain (ARDENT)
